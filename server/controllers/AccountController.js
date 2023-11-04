@@ -37,7 +37,7 @@ export const registerAccount = async (req, res) => {
       }
     );
 
-    const { accountData } = account._doc;
+    const { passwordHash, accountData } = account._doc;
 
     res.json({
       ...accountData,
@@ -46,7 +46,67 @@ export const registerAccount = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      message: 'registration failed',
+      message: 'Registration failed',
+    });
+  }
+};
+
+export const loginAccount = async (req, res) => {
+  try {
+    const account = await Account.findOne({ email: req.body.email });
+
+    if (!account) {
+      return res.status(404).json({ message: 'Wrong email or password' });
+    }
+
+    const isValidPass = await bcrypt.compare(
+      req.body.password,
+      account._doc.passwordHash
+    );
+
+    if (!isValidPass) {
+      return res.status(400).json({ message: 'Wrong email or password' });
+    }
+
+    const token = jwt.sign(
+      {
+        _id: account._id,
+      },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: '30d',
+      }
+    );
+
+    const { passwordHash, ...accountData } = account._doc;
+
+    res.json({
+      ...accountData,
+      token,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      message: 'Authorization failed',
+    });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const account = await Account.findById(req.userId);
+    if (!account) {
+      return res.status(404).json({
+        message: 'Пользователь не найден',
+      });
+    }
+    const { passwordHash, ...accountData } = account._doc;
+
+    res.json(accountData);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'нет доступа',
     });
   }
 };
