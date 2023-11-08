@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import accountRoutes from './routes/AccountRoutes.js';
+import PassengerRoutes from './routes/PassengerRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -24,6 +25,7 @@ db.once('open', () => {
 });
 
 app.use(accountRoutes);
+app.use(PassengerRoutes);
 
 const PORT = process.env.PORT || 7001;
 

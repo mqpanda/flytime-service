@@ -11,13 +11,13 @@ const accountSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
     passengers: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Passenger',
       },
     ],
+    avatarUrl: String,
   },
   {
     timestamps: true,

@@ -13,6 +13,10 @@ const passengerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  passport_id: {
+    type: String,
+    required: true,
+  },
   account_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Account',
