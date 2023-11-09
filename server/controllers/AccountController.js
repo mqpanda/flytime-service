@@ -30,6 +30,7 @@ export const registerAccount = async (req, res) => {
     const token = jwt.sign(
       {
         _id: account._id,
+        role: account.role,
       },
       process.env.SECRET_KEY,
       {
@@ -71,6 +72,7 @@ export const loginAccount = async (req, res) => {
     const token = jwt.sign(
       {
         _id: account._id,
+        role: account.role,
       },
       process.env.SECRET_KEY,
       {

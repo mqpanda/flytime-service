@@ -11,6 +11,11 @@ const accountSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ['user', 'air carrier', 'admin'],
+      default: 'user',
+    },
     passengers: [
       {
         type: mongoose.Schema.Types.ObjectId,
