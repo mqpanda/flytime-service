@@ -15,7 +15,7 @@ router.get(
   checkUserRole(['user', 'air carrier', 'admin']),
   AccountController.getMe
 );
-router.get('/api/admin', checkAuth, checkUserRole(['admin']), (req, res) => {
+router.get('/api/admin', checkAuth, checkUserRole(['admin']), (res) => {
   res.json({ message: 'Доступ разрешен для администратора' });
 });
 

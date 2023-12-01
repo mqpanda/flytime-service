@@ -37,7 +37,6 @@ export const createPassenger = async (req, res) => {
     account.passengers.push(savedPassenger._id);
     await account.save();
 
-    console.log('Passenger created successfully');
     res.status(201).json(savedPassenger);
   } catch (error) {
     console.error('Error creating passenger:', error);
@@ -77,8 +76,8 @@ export const getAllPassengers = async (req, res) => {
 
     const passengers = account.passengers;
     res.status(200).json(passengers);
-  } catch (err) {
-    console.error('Error fetching passengers:', err);
+  } catch (error) {
+    console.error('Error fetching passengers:', error);
     res.status(500).json({ message: 'Error fetching passengers' });
   }
 };

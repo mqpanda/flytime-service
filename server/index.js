@@ -4,7 +4,11 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import accountRoutes from './routes/AccountRoutes.js';
 import PassengerRoutes from './routes/PassengerRoutes.js';
+import AdminRoutes from './routes/AdminRoutes.js';
+import AirCarrierRoutes from './routes/AirCarrierRoutes.js';
 dotenv.config();
+
+// Запуск DB: mongod --dbpath ~/data/db
 
 const app = express();
 
@@ -26,6 +30,8 @@ db.once('open', () => {
 
 app.use(accountRoutes);
 app.use(PassengerRoutes);
+app.use(AdminRoutes);
+app.use(AirCarrierRoutes);
 
 const PORT = process.env.PORT || 7001;
 
