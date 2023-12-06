@@ -1,31 +1,40 @@
 import { useState } from 'react';
 import axios from 'axios';
 import RegisterModal from '../Common/Modal/Register/RegisterModal';
-import styles from './Register.module.scss';
+import styles from './Header.module.scss'; // Adjust the path to your header styles
 
-const Register = () => {
+const Header = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [notification, setNotification] = useState(null);
   const [isRegisterMode, setRegisterMode] = useState(true);
-
-  const openModal = () => {
-    setModalOpen(true);
-    setNotification(null); // Clear any existing notifications when opening the modal
-  };
+  const [isAuthenticated, setAuthenticated] = useState(
+    !!localStorage.getItem('token')
+  );
 
   const closeModal = () => {
     setModalOpen(false);
-    setNotification(null); // Clear any existing notifications when closing the modal
+    setNotification(null);
+  };
+
+  const openSignInModal = () => {
+    setModalOpen(true);
+    setRegisterMode(false);
+    setNotification(null);
+  };
+
+  const openSignUpModal = () => {
+    setModalOpen(true);
+    setRegisterMode(true);
+    setNotification(null);
   };
 
   const handleAction = async () => {
     if (isRegisterMode) {
       await handleRegister();
     } else {
-      // Handle sign-in
-      // Implement your sign-in logic here
+      await handleLogin();
     }
   };
 
@@ -52,10 +61,8 @@ const Register = () => {
       // Display success notification
       setNotification({ type: 'success', message: 'Registration successful!' });
 
-      // Close the modal after a delay
-      setTimeout(() => {
-        closeModal();
-      }, 2000);
+      // Automatically log in the user after registration
+      await handleLogin();
     } catch (error) {
       if (
         axios.isAxiosError(error) &&
@@ -80,15 +87,90 @@ const Register = () => {
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:5001/api/login', {
+        email: email,
+        password: password,
+      });
+
+      // Assuming your backend returns a token and role upon successful login
+      const { token } = response.data;
+
+      // Save the token to local storage or wherever you handle authentication
+      localStorage.setItem('token', token);
+
+      setAuthenticated(true);
+
+      // Close the modal
+      closeModal();
+    } catch (error) {
+      // Handle login error (e.g., show an error message)
+      console.error('Login failed:', error.message);
+    }
+  };
+
+  const handleLogout = () => {
+    // Implement your logout logic here
+    // Clear the authentication token from local storage
+    localStorage.removeItem('token');
+    // Update the authentication status
+    setAuthenticated(false);
+    // Redirect or update the UI as needed
+  };
+
   const toggleMode = () => {
     setRegisterMode((prevMode) => !prevMode);
-    setNotification(null); // Clear any existing notifications when toggling mode
+    setNotification(null);
   };
 
   return (
-    <div>
-      <button onClick={openModal}>Register</button>
+    <div className={styles.header}>
+      <h2 className={styles.logo}>
+        <span className={styles.logoColor}>fly</span>time
+      </h2>
+      <nav>
+        <ul className={styles.navbar}>
+          <li>Flights</li>
+          <li>Popular destinations</li>
+          <li>Blog</li>
+          {!isAuthenticated && (
+            <li>
+              <button className={styles.signin} onClick={openSignInModal}>
+                Sign in
+              </button>
+            </li>
+          )}
+          {!isAuthenticated && (
+            <li>
+              <button className={styles.signup} onClick={openSignUpModal}>
+                Sign up
+              </button>
+            </li>
+          )}
+          {isAuthenticated && (
+            <li>
+              <button className={styles.profile}>
+                {/* <img
+                  className={styles.profileImg}
+                  src={profile}
+                  alt="profile"
+                /> */}
+                <li>Profile</li>
+              </button>
+            </li>
+          )}
+          {isAuthenticated && (
+            <li>
+              <button className={styles.signup} onClick={handleLogout}>
+                Logout
+              </button>
+            </li>
+          )}
+        </ul>
+      </nav>
 
+      {/* Assuming the RegisterModal component is styled with the styles imported */}
       <RegisterModal isOpen={isModalOpen} onClose={closeModal}>
         <div className={styles.container}>
           <h1 className={styles.textHeader}>
@@ -98,7 +180,7 @@ const Register = () => {
             <p>
               {isRegisterMode
                 ? 'Sign up using your email address below to get started'
-                : 'Sign in using your credentials'}
+                : 'Hello again! To start a new adventure please fill in the information'}
             </p>
             <div className={styles.inputFields}>
               <input
@@ -153,4 +235,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Header;
