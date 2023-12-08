@@ -86,31 +86,89 @@
   align-items: center;
   padding: 0 64px;
 
+  @media (max-width: 950px) {
+    justify-content: flex-start;
+    padding: 0 32px;
+  }
+
+  @media (max-width: 500px) {
+    justify-content: flex-start;
+    padding: 0 16px;
+  }
+
+  .burgerIcon {
+    display: none;
+    cursor: pointer;
+    z-index: 3;
+    padding-right: 20px;
+    @media (max-width: 950px) {
+      display: block;
+    }
+  }
+
+  .navbarContainer {
+    @media (max-width: 950px) {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      justify-content: left;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      z-index: 1;
+      height: 100%;
+    }
+  }
+
+  .showBurger {
+    @media (max-width: 950px) {
+      display: flex;
+    }
+  }
+
   .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
+    @media (max-width: 950px) {
+      justify-content: left;
+      flex-direction: column;
+      height: 100%;
+      padding-top: 70px;
+    }
+    @media (max-width: 500px) {
+      padding-left: 0;
+    }
 
-  li {
-    font-family: 'Nunito Sans', sans-serif;
-    text-decoration: none;
-    list-style-type: none;
-    font-size: 16px;
-    text-align: center;
-    margin: 0 12px;
-    color: #646b83;
-    cursor: pointer;
-  }
+    li {
+      font-family: 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      list-style-type: none;
+      font-size: 16px;
+      text-align: center;
+      margin: 0 12px;
+      color: #646b83;
+      cursor: pointer;
+      @media (max-width: 950px) {
+        margin-bottom: 20px;
+      }
+    }
 
-  :hover {
-    color: #000;
-    font-weight: bold;
+    li:hover {
+      color: #000;
+      font-weight: bold;
+    }
   }
 
   .logo {
     font-family: 'Jaguar Bold';
     font-size: 24px;
+    color: #000;
+
+    a {
+      color: #000;
+    }
   }
 
   .logoColor {
@@ -118,7 +176,7 @@
   }
 
   .signin {
-    background-color: #fff;
+    background-color: #ffffff00;
     border: 0;
     font-family: 'Nunito Sans', sans-serif;
     font-size: 16px;
@@ -126,7 +184,7 @@
     cursor: pointer;
   }
 
-  :hover {
+  .signin:hover {
     color: #000;
     font-weight: bold;
   }
@@ -151,5 +209,10 @@
 
   .profileImg {
     width: 30px;
+  }
+
+  a {
+    text-decoration: none;
+    color: #646b83;
   }
 }

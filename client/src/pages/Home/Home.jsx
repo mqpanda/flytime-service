@@ -1,11 +1,8 @@
-import Header from '../../components/Header/Header';
-
 const Home = () => {
   return (
     <div>
-      <Header />
       <header>
-        <h1>Welcome to FlyTime</h1>
+        <h1>Test page</h1>
       </header>
     </div>
   );

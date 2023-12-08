@@ -9,6 +9,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  @media (max-width: 950px) {
+    z-index: 4;
+  }
 }
 
 .modal {

@@ -1,9 +1,11 @@
+import BlogFilters from '../../components/Blog/BlogFilters';
+import styles from './Blog.module.scss';
+
 const Blog = () => {
   return (
-    <div>
-      <header>
-        <h1>Welcome to Blog</h1>
-      </header>
+    <div className={styles.container}>
+      <h1>BLOG</h1>
+      <BlogFilters />
     </div>
   );
 };

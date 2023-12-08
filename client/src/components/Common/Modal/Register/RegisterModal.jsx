@@ -2,7 +2,7 @@
 import ReactModal from 'react-modal';
 import styles from './RegisterModal.module.scss';
 import PropTypes from 'prop-types';
-import close from '../close.svg';
+import close from '../../../../images/close.svg';
 
 const RegisterModal = ({ isOpen, onClose, children }) => {
   return (

@@ -2,6 +2,10 @@ import { useState } from 'react';
 import axios from 'axios';
 import RegisterModal from '../Common/Modal/Register/RegisterModal';
 import styles from './Header.module.scss'; // Adjust the path to your header styles
+import { Link } from 'react-router-dom';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root'); // Set your root element's id here
 
 const Header = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -12,6 +16,7 @@ const Header = () => {
   const [isAuthenticated, setAuthenticated] = useState(
     !!localStorage.getItem('token')
   );
+  const [isBurgerVisible, setBurgerVisible] = useState(false);
 
   const closeModal = () => {
     setModalOpen(false);
@@ -40,12 +45,10 @@ const Header = () => {
 
   const handleRegister = async () => {
     try {
-      // Basic email validation
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         throw new Error('Invalid email address');
       }
 
-      // Basic password length validation
       if (password.length < 8) {
         throw new Error('Password must be at least 8 characters long');
       }
@@ -55,13 +58,10 @@ const Header = () => {
         password: password,
       });
 
-      // Handle successful registration
       console.log('Registration successful:', response.data);
 
-      // Display success notification
       setNotification({ type: 'success', message: 'Registration successful!' });
 
-      // Automatically log in the user after registration
       await handleLogin();
     } catch (error) {
       if (
@@ -69,19 +69,15 @@ const Header = () => {
         error.response &&
         error.response.status === 409
       ) {
-        // User already exists (409 conflict)
         console.error('User already exists:', error.message);
 
-        // Display user exists notification
         setNotification({
           type: 'error',
           message: 'User already exists. Please use a different email.',
         });
       } else {
-        // Other registration errors
         console.error('Registration failed:', error.message);
 
-        // Display error notification
         setNotification({ type: 'error', message: error.message });
       }
     }
@@ -94,29 +90,21 @@ const Header = () => {
         password: password,
       });
 
-      // Assuming your backend returns a token and role upon successful login
       const { token } = response.data;
 
-      // Save the token to local storage or wherever you handle authentication
       localStorage.setItem('token', token);
 
       setAuthenticated(true);
 
-      // Close the modal
       closeModal();
     } catch (error) {
-      // Handle login error (e.g., show an error message)
       console.error('Login failed:', error.message);
     }
   };
 
   const handleLogout = () => {
-    // Implement your logout logic here
-    // Clear the authentication token from local storage
     localStorage.removeItem('token');
-    // Update the authentication status
     setAuthenticated(false);
-    // Redirect or update the UI as needed
   };
 
   const toggleMode = () => {
@@ -124,16 +112,35 @@ const Header = () => {
     setNotification(null);
   };
 
+  const toggleBurger = () => {
+    setBurgerVisible((prevVisible) => !prevVisible);
+  };
+
   return (
     <div className={styles.header}>
+      <div className={styles.burgerIcon} onClick={toggleBurger}>
+        <span>&#9776;</span>
+      </div>
       <h2 className={styles.logo}>
-        <span className={styles.logoColor}>fly</span>time
+        <Link to="/">
+          <span className={styles.logoColor}>fly</span>time
+        </Link>
       </h2>
-      <nav>
-        <ul className={styles.navbar}>
+      <nav
+        className={`${styles.navbarContainer} ${
+          isBurgerVisible ? styles.showBurger : ''
+        }`}
+      >
+        <ul
+          className={`${styles.navbar} ${
+            isAuthenticated ? styles.authenticated : ''
+          }`}
+        >
           <li>Flights</li>
           <li>Popular destinations</li>
-          <li>Blog</li>
+          <li>
+            <Link to="/blog">Blog</Link>
+          </li>
           {!isAuthenticated && (
             <li>
               <button className={styles.signin} onClick={openSignInModal}>
@@ -151,11 +158,6 @@ const Header = () => {
           {isAuthenticated && (
             <li>
               <button className={styles.profile}>
-                {/* <img
-                  className={styles.profileImg}
-                  src={profile}
-                  alt="profile"
-                /> */}
                 <li>Profile</li>
               </button>
             </li>
@@ -170,7 +172,6 @@ const Header = () => {
         </ul>
       </nav>
 
-      {/* Assuming the RegisterModal component is styled with the styles imported */}
       <RegisterModal isOpen={isModalOpen} onClose={closeModal}>
         <div className={styles.container}>
           <h1 className={styles.textHeader}>
