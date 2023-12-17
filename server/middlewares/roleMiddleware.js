@@ -9,7 +9,7 @@ export const checkUserRole = (allowedRoles) => {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
         if (allowedRoles.includes(decoded.role)) {
-          req.userId = decoded._id;
+          req.accountID = decoded._id;
           next();
         } else {
           return res.status(403).json({

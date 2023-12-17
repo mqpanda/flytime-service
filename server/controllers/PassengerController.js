@@ -14,7 +14,7 @@ export const createPassenger = async (req, res) => {
         .json({ message: 'All required fields must be provided' });
     }
 
-    const account = await Account.findById(req.userId);
+    const account = await Account.findById(req.accountID);
 
     if (!account) {
       return res.status(404).json({ message: 'Account not found' });
@@ -29,7 +29,7 @@ export const createPassenger = async (req, res) => {
       last_name: req.body.last_name,
       phone_number: req.body.phone_number,
       passport_id: req.body.passport_id,
-      account_id: req.userId,
+      account_id: req.accountID,
     });
 
     const savedPassenger = await passenger.save();
@@ -47,7 +47,9 @@ export const createPassenger = async (req, res) => {
 export const getOnePassenger = async (req, res) => {
   const passengerId = req.params.passengerId;
   try {
-    const account = await Account.findById(req.userId).populate('passengers');
+    const account = await Account.findById(req.accountID).populate(
+      'passengers'
+    );
 
     if (!account) {
       return res.status(404).json({ message: 'Account not found' });
@@ -68,7 +70,9 @@ export const getOnePassenger = async (req, res) => {
 
 export const getAllPassengers = async (req, res) => {
   try {
-    const account = await Account.findById(req.userId).populate('passengers');
+    const account = await Account.findById(req.accountID).populate(
+      'passengers'
+    );
 
     if (!account) {
       return res.status(404).json({ message: 'Account not found' });
@@ -86,7 +90,7 @@ export const deletePassenger = async (req, res) => {
   const passengerId = req.params.passengerId;
 
   try {
-    const account = await Account.findById(req.userId);
+    const account = await Account.findById(req.accountID);
 
     if (!account) {
       return res.status(404).json({ message: 'Account not found' });

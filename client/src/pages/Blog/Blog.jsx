@@ -1,4 +1,4 @@
-import BlogFilters from '../../components/Blog/BlogFilters';
+import BlogFilters from '../../components/Blog/BlogFilters/BlogFilters';
 import styles from './Blog.module.scss';
 
 const Blog = () => {

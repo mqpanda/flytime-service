@@ -1,5 +1,5 @@
 import express from 'express';
-import { AccountController } from '../controllers/index.js';
+import { AccountController, PostController } from '../controllers/index.js';
 import { checkAuth } from '../middlewares/index.js';
 import { checkUserRole } from '../middlewares/roleMiddleware.js';
 

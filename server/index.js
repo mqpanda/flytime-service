@@ -6,6 +6,7 @@ import accountRoutes from './routes/AccountRoutes.js';
 import PassengerRoutes from './routes/PassengerRoutes.js';
 import AdminRoutes from './routes/AdminRoutes.js';
 import AirCarrierRoutes from './routes/AirCarrierRoutes.js';
+
 dotenv.config();
 
 // Запуск DB: mongod --dbpath ~/data/db
@@ -15,6 +16,7 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads')); // Serve uploaded files statically
 
 mongoose.connect(process.env.MONGO_URL);
 
