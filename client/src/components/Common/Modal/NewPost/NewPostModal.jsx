@@ -1,10 +1,9 @@
-// Modal.jsx
 import ReactModal from 'react-modal';
-import styles from './RegisterModal.module.scss';
+import styles from './NewPostModal.module.scss';
 import PropTypes from 'prop-types';
 import close from '../../../../images/close.svg';
 
-const RegisterModal = ({ isOpen, onClose, children }) => {
+const NewPostModal = ({ isOpen, onClose, onSubmit, children }) => {
   return (
     <ReactModal
       isOpen={isOpen}
@@ -16,15 +15,21 @@ const RegisterModal = ({ isOpen, onClose, children }) => {
       <button className={styles.closeButton} onClick={onClose}>
         <img src={close} alt="Close" />
       </button>
-      {children}
+      <div className={styles.content}>
+        {children}
+        <button className={styles.submitButton} onClick={onSubmit}>
+          Create Post
+        </button>
+      </div>
     </ReactModal>
   );
 };
 
-RegisterModal.propTypes = {
+NewPostModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
 };
 
-export default RegisterModal;
+export default NewPostModal;

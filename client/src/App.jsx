@@ -6,6 +6,8 @@ import SearchResult from './pages/SearchResult/SearchResult';
 import Register from './components/Register/Register';
 import Header from './components/Header/Header';
 
+import MyPostsPage from './pages/MyPosts/MyPostsPage';
+
 const App = () => {
   return (
     <Router>
@@ -15,6 +17,7 @@ const App = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/search-result" element={<SearchResult />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/my-posts" element={<MyPostsPage />} />
       </Routes>
     </Router>
   );

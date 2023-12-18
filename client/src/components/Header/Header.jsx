@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import axios from 'axios';
 import RegisterModal from '../Common/Modal/Register/RegisterModal';
 import styles from './Header.module.scss'; // Adjust the path to your header styles
@@ -17,6 +18,16 @@ const Header = () => {
     !!localStorage.getItem('token')
   );
   const [isBurgerVisible, setBurgerVisible] = useState(false);
+  const [userRole, setUserRole] = useState(''); // Add userRole state
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole');
+    if (token && role) {
+      setAuthenticated(true);
+      setUserRole(role);
+    }
+  }, []);
 
   const closeModal = () => {
     setModalOpen(false);
@@ -34,7 +45,6 @@ const Header = () => {
     setRegisterMode(true);
     setNotification(null);
   };
-
   const handleAction = async () => {
     if (isRegisterMode) {
       await handleRegister();
@@ -90,12 +100,13 @@ const Header = () => {
         password: password,
       });
 
-      const { token } = response.data;
+      const { token, role } = response.data;
 
       localStorage.setItem('token', token);
+      localStorage.setItem('userRole', role); // Set user's role in local storage
 
       setAuthenticated(true);
-
+      setUserRole(role);
       closeModal();
     } catch (error) {
       console.error('Login failed:', error.message);
@@ -141,6 +152,12 @@ const Header = () => {
           <li>
             <Link to="/blog">Blog</Link>
           </li>
+          {isAuthenticated && userRole === 'air carrier' && (
+            <li>
+              <Link to="/my-posts">My Posts</Link>
+            </li>
+          )}
+
           {!isAuthenticated && (
             <li>
               <button className={styles.signin} onClick={openSignInModal}>
