@@ -1,0 +1,218 @@
+.container {
+  padding: 60px;
+
+  .textHeader {
+    font-family: 'Jaguar Bold';
+    font-size: 40px;
+    margin: 0;
+    padding-bottom: 30px;
+  }
+
+  .inputFields {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+  }
+
+  p {
+    font-family: 'Nunito Sans', sans-serif;
+    color: #646b83;
+    font-size: 18px;
+  }
+
+  .button {
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+    width: 100%;
+    height: 48px;
+    border: 0;
+    border-radius: 12px;
+    font-size: 18px;
+    margin-bottom: 30px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: #646b83;
+  }
+
+  .inputField {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px #ebeef1 solid;
+    margin-bottom: 10px;
+    box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--grey-1, #646b83);
+    font-family: Nunito Sans;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    padding: 0 20px;
+  }
+
+  a {
+    text-decoration: none;
+    color: #000000;
+    cursor: pointer;
+  }
+
+  .conditions {
+    margin-bottom: 30px;
+  }
+
+  .notification {
+    font-family: 'Nunito Sans', sans-serif;
+    margin-bottom: 10px;
+  }
+
+  .success {
+    color: #11bb08;
+  }
+
+  .error {
+    color: #bb0808;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 64px;
+
+  @media (max-width: 950px) {
+    justify-content: flex-start;
+    padding: 0 32px;
+  }
+
+  @media (max-width: 500px) {
+    justify-content: flex-start;
+    padding: 0 16px;
+  }
+
+  .burgerIcon {
+    display: none;
+    cursor: pointer;
+    z-index: 3;
+    padding-right: 20px;
+    @media (max-width: 950px) {
+      display: block;
+    }
+  }
+
+  .navbarContainer {
+    @media (max-width: 950px) {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      justify-content: left;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      z-index: 1;
+      height: 100%;
+    }
+  }
+
+  .showBurger {
+    @media (max-width: 950px) {
+      display: flex;
+    }
+  }
+
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @media (max-width: 950px) {
+      justify-content: left;
+      flex-direction: column;
+      height: 100%;
+      padding-top: 70px;
+    }
+    @media (max-width: 500px) {
+      padding-left: 0;
+    }
+
+    li {
+      font-family: 'Nunito Sans', sans-serif;
+      text-decoration: none;
+      list-style-type: none;
+      font-size: 16px;
+      text-align: center;
+      margin: 0 12px;
+      color: #646b83;
+      cursor: pointer;
+      @media (max-width: 950px) {
+        margin-bottom: 20px;
+      }
+    }
+
+    li:hover {
+      color: #000;
+      font-weight: bold;
+    }
+  }
+
+  .logo {
+    font-family: 'Jaguar Bold';
+    font-size: 24px;
+    color: #000;
+
+    a {
+      color: #000;
+    }
+  }
+
+  .logoColor {
+    color: #a44546;
+  }
+
+  .signin {
+    background-color: #ffffff00;
+    border: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    color: #646b83;
+    cursor: pointer;
+  }
+
+  .signin:hover {
+    color: #000;
+    font-weight: bold;
+  }
+
+  .signup {
+    background-color: #000;
+    color: #fff;
+    border: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    height: 48px;
+    padding: 12px 32px;
+    align-items: center;
+    border-radius: 8px;
+  }
+
+  .profile {
+    background-color: #ffffff00;
+    border: 0;
+  }
+
+  .profileImg {
+    width: 30px;
+  }
+
+  a {
+    text-decoration: none;
+    color: #646b83;
+  }
+}
