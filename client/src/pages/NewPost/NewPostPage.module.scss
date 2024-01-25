@@ -1,0 +1,103 @@
+.container {
+  padding: 48px 64px;
+  width: 1312px;
+  margin: 0 auto;
+
+  .tools {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .preShow {
+    width: 100%;
+
+    img {
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+h2,
+h3 {
+  font-family: 'Jaguar Bold';
+}
+
+p,
+div {
+  font-family: 'Nunito Sans';
+}
+
+textarea,
+.inputField {
+  height: 28px;
+  border-radius: 12px;
+  border: 1px #ebeef1 solid;
+  box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--grey-1, #646b83);
+  font-family: Nunito Sans;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 8px;
+  width: 90%;
+}
+
+.formBlock {
+  width: 100%;
+}
+
+.textInfo {
+  height: 300px;
+  width: 90%;
+}
+
+.hiddenFileInput {
+  display: none;
+}
+
+.previewImage {
+  width: 40%;
+}
+
+.customFileButton {
+  background-color: #000000;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.customFileButton:hover {
+  background-color: #393939;
+}
+
+.postButton {
+  margin-top: 20px;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'Nunito Sans';
+
+  box-shadow: 0px 5px 10px -5px rgba(34, 60, 80, 0.2);
+}
+
+.fieldName {
+  margin-top: 20px;
+}
+.labelContainer {
+  margin-bottom: 16px; // Adjust the value based on your preferred spacing
+}
+
+.toolName {
+  padding-bottom: 10px;
+}

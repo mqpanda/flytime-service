@@ -6,7 +6,7 @@ import styles from './Header.module.scss'; // Adjust the path to your header sty
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 
-Modal.setAppElement('#root'); // Set your root element's id here
+Modal.setAppElement('#root');
 
 const Header = () => {
   const [isModalOpen, setModalOpen] = useState(false);

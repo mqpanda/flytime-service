@@ -1,7 +1,7 @@
 // BlogPosts.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import styles from './BlogPosts.module.scss';
 import BlogFilters from '../BlogFilters/BlogFilters';
 
@@ -51,6 +51,15 @@ const BlogPosts = () => {
     window.scrollTo(0, 0);
   };
 
+  const increaseViews = async (postId) => {
+    try {
+      // Отправляем запрос на увеличение просмотров
+      await axios.post(`http://localhost:5001/api/posts/${postId}/views`);
+    } catch (error) {
+      console.error('Error while increasing views:', error);
+    }
+  };
+
   const formatDate = (createdAt) => {
     const dateObject = new Date(createdAt);
     const year = dateObject.getFullYear();
@@ -65,18 +74,19 @@ const BlogPosts = () => {
         ? posts
         : posts.filter((post) => post.tags.includes(selectedTag));
     const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+
+    // Don't render pagination if there's only one page
+    if (totalPages <= 1) {
+      return null;
+    }
+
     const maxVisiblePages = 3;
+    let buttons = [];
 
-    const buttons = [];
-
-    // Calculate start and end pages to show the current page and its two neighbors
     let startPage = Math.max(1, currentPage - 1);
     let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
-
-    // If there are not enough pages to fill the maxVisiblePages, adjust the startPage
     startPage = Math.max(1, endPage - maxVisiblePages + 1);
 
-    // Render page buttons
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <button
@@ -111,16 +121,30 @@ const BlogPosts = () => {
       <BlogFilters onFilterClick={handleTagClick} selectedTag={selectedTag} />
       <div className={styles.postsContainer}>
         {filterPosts().map((post) => (
-          <div className={styles.post} key={post._id}>
-            <img src={`http://localhost:5001/${post.imageUrl}`} alt="Post" />
-            <div className={styles.info}>
-              <h3 className={styles.title}>{post.title}</h3>
-              <div className={styles.subinfo}>
-                <p>by {post.account ? post.account.email : 'Unknown Author'}</p>
-                <p>{formatDate(post.createdAt)}</p>
+          <Link
+            to={`/blog/${post._id}`}
+            key={post._id}
+            className={styles.postLink}
+          >
+            <div
+              className={styles.post}
+              onClick={() => {
+                // При нажатии на пост вызывается функция увеличения просмотров
+                increaseViews(post._id);
+              }}
+            >
+              <img src={`http://localhost:5001/${post.imageUrl}`} alt="Post" />
+              <div className={styles.info}>
+                <h3 className={styles.title}>{post.title}</h3>
+                <div className={styles.subinfo}>
+                  <p>
+                    by {post.account ? post.account.email : 'Unknown Author'}
+                  </p>
+                  <p>{formatDate(post.createdAt)}</p>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
       <div className={styles.pagination}>{renderPaginationButtons()}</div>

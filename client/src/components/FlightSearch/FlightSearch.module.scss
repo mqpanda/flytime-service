@@ -1,0 +1,104 @@
+.searchPanel {
+  display: flex;
+  width: 1312px;
+  height: 56px;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 12px 24px 0px rgba(27, 59, 119, 0.05),
+    0px 24px 60px 0px rgba(6, 47, 125, 0.05),
+    2px 2px 4px 0px rgba(7, 4, 146, 0.15);
+  border-radius: 8px;
+  position: relative;
+
+  background: var(--white, #fff);
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .from,
+  .where {
+    width: 375px;
+    padding: 12px 16px;
+    border-right: 1px #b7c1d2 solid;
+  }
+
+  .date {
+    width: 252px;
+    padding: 12px 16px;
+    border-right: 1px #b7c1d2 solid;
+  }
+
+  .count {
+    width: 200px;
+    background-color: #fff;
+    padding: 12px 16px;
+    border: 0;
+    display: flex;
+    align-items: center;
+    font-family: 'Nunito Sans';
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    gap: 8px;
+  }
+
+  input {
+    height: 32px;
+    border: 0;
+    font-family: 'Nunito Sans';
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+  input:focus {
+    border: none; /* Убираем рамку при фокусе */
+    outline: none; /* Убираем обводку при фокусе (если есть) */
+  }
+  input::placeholder {
+    color: #000;
+    font-family: 'Nunito Sans';
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  .wrapper {
+    position: relative;
+  }
+
+  .steppers {
+    position: absolute;
+    top: 100%; /* Разместить панель под кнопкой */
+
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .searchButton {
+    width: 144px;
+    display: flex;
+    justify-content: center;
+    height: 56px;
+    border: 0;
+    border-radius: 8px;
+    background-color: #000;
+    font-family: 'Nunito Sans';
+    color: #fff;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    align-items: center;
+    gap: 8px;
+  }
+}

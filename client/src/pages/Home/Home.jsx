@@ -1,9 +1,12 @@
+import FlightSearch from '../../components/FlightSearch/FlightSearch';
+import styles from './Home.module.scss';
+
 const Home = () => {
   return (
     <div>
-      <header>
-        <h1>Test page</h1>
-      </header>
+      <div className={styles.search}>
+        <FlightSearch />
+      </div>
     </div>
   );
 };

@@ -1,22 +1,7 @@
 import mongoose from 'mongoose';
 
 const flightSchema = new mongoose.Schema({
-  // aircraft: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'Aircraft',
-  //   required: true,
-  // },
   flightNumber: { type: String, unique: true, required: true },
-  // departureAirport: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'Airport',
-  //   required: true,
-  // },
-  // arrivalAirport: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'Airport',
-  //   required: true,
-  // },
   aircraft: { type: String, required: true },
   departureAirport: { type: String, required: true },
   arrivalAirport: { type: String, required: true },

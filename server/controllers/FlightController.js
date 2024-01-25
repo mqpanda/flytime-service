@@ -66,7 +66,7 @@ export const getFlightsByParam = async (req, res) => {
       arrivalAirport,
       departureTime,
       numberOfPassengers,
-    } = req.body;
+    } = req.query;
 
     const directFilters = {
       departureAirport,

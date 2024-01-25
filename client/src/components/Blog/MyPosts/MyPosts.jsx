@@ -1,12 +1,9 @@
-// Доделать окно добавления постов!!!
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import styles from './MyPosts.module.scss';
 import BlogFilters from '../BlogFilters/BlogFilters';
-import NewPostModal from '../../Common/Modal/NewPost/NewPostModal';
 
 const MyPosts = () => {
   const navigate = useNavigate();
@@ -17,39 +14,22 @@ const MyPosts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(9);
 
-  const [newPost, setNewPost] = useState({
-    title: '',
-    text: '',
-    tags: '',
-    imageUrl: null,
-  });
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const fetchPosts = async () => {
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        console.error('User not authenticated');
-        return;
-      }
-
-      const response = await axios.get(
-        'http://localhost:5001/api/posts-by-account',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setPosts(response.data);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    }
-  };
-
   useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/posts');
+
+        // Sort posts by creation date in descending order
+        const sortedPosts = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setPosts(sortedPosts);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
     fetchPosts();
   }, []);
 
@@ -58,54 +38,6 @@ const MyPosts = () => {
     const newPage = pageParam ? parseInt(pageParam, 10) : 1;
     setCurrentPage(newPage);
   }, [location.search]);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCreatePost = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append('title', newPost.title);
-    formData.append('text', newPost.text);
-    formData.append('tags', newPost.tags);
-    formData.append('imageUrl', newPost.imageUrl); // Ensure this matches the field name specified in upload.single()
-
-    try {
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        console.error('User not authenticated');
-        return;
-      }
-
-      await axios.post('http://localhost:5001/api/post/add', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      // After successful creation, fetch the updated list of posts
-      fetchPosts();
-      // Optionally, reset the new post form
-      setNewPost({
-        title: '',
-        text: '',
-        tags: '',
-        imageUrl: null,
-      });
-      // Close the modal
-      closeModal();
-    } catch (error) {
-      console.error('Error creating post:', error);
-    }
-  };
 
   const handleTagClick = (tag) => {
     setSelectedTag(tag);
@@ -127,14 +59,41 @@ const MyPosts = () => {
     return `${day}.${month}.${year}`;
   };
 
+  const deletePost = async (postId) => {
+    try {
+      // Send a DELETE request to delete the post
+      await axios.delete(`http://localhost:5001/api/posts/${postId}`);
+
+      // After successful deletion, fetch the updated list of posts
+      const response = await axios.get('http://localhost:5001/api/posts');
+      const sortedPosts = response.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setPosts(sortedPosts);
+
+      // You may also want to update the pagination and re-render the posts
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
+  const handleEditClick = (postId) => {
+    navigate(`/edit-post/${postId}`);
+  };
+
   const renderPaginationButtons = () => {
     const filteredPosts =
       selectedTag === 'All'
         ? posts
         : posts.filter((post) => post.tags.includes(selectedTag));
     const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-    const maxVisiblePages = 3;
 
+    // Don't render pagination if there's only one page
+    if (totalPages <= 1) {
+      return null;
+    }
+
+    const maxVisiblePages = 3;
     let buttons = [];
 
     let startPage = Math.max(1, currentPage - 1);
@@ -170,65 +129,47 @@ const MyPosts = () => {
     );
   };
 
+  const openNewPostPage = () => {
+    navigate('/new-post'); // Navigate to the new post page
+  };
+
   return (
     <div>
       <BlogFilters onFilterClick={handleTagClick} selectedTag={selectedTag} />
 
-      {/* Button to open the modal */}
-      <button className={styles.postButton} onClick={openModal}>
+      {/* Button to navigate to the new post page */}
+      <button className={styles.postButton} onClick={openNewPostPage}>
         Create New Post
       </button>
 
-      {/* NewPostModal component */}
-      <NewPostModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onSubmit={handleCreatePost}
-      >
-        {/* Form fields for creating a new post */}
-        <h1>Add Post</h1>
-        <label>
-          <div>Title:</div>
-          <input
-            type="text"
-            value={newPost.title}
-            onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-          />
-        </label>
-        <label>
-          <div>Text:</div>
-          <textarea
-            value={newPost.text}
-            onChange={(e) => setNewPost({ ...newPost, text: e.target.value })}
-          />
-        </label>
-        <label>
-          <div>Tags:</div>
-          <input
-            type="text"
-            value={newPost.tags}
-            onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
-          />
-        </label>
-        <input
-          type="file"
-          onChange={(e) =>
-            setNewPost({ ...newPost, imageUrl: e.target.files[0] })
-          }
-        />{' '}
-        *
-      </NewPostModal>
-
       <div className={styles.postsContainer}>
         {filterPosts().map((post) => (
-          <div className={styles.post} key={post._id}>
-            <img src={`http://localhost:5001/${post.imageUrl}`} alt="Post" />
-            <div className={styles.info}>
-              <h3 className={styles.title}>{post.title}</h3>
-              <div className={styles.subinfo}>
-                <p>by {post.account ? post.account.email : 'Unknown Author'}</p>
-                <p>{formatDate(post.createdAt)}</p>
+          <div key={post._id} className={styles.post}>
+            <Link to={`/blog/${post._id}`} className={styles.postLink}>
+              <img src={`http://localhost:5001/${post.imageUrl}`} alt="Post" />
+              <div className={styles.info}>
+                <h3 className={styles.title}>{post.title}</h3>
+                <div className={styles.subinfo}>
+                  <p>
+                    by {post.account ? post.account.email : 'Unknown Author'}
+                  </p>
+                  <p>{formatDate(post.createdAt)}</p>
+                </div>
               </div>
+            </Link>
+            <div className={styles.tools}>
+              <button
+                onClick={() => handleEditClick(post._id)}
+                className={styles.button}
+              >
+                Edit Post
+              </button>
+              <button
+                onClick={() => deletePost(post._id)}
+                className={styles.button}
+              >
+                Delete Post
+              </button>
             </div>
           </div>
         ))}

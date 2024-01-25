@@ -10,11 +10,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.6.2",
+    "@tinymce/tinymce-react": "^4.3.2",
+    "axios": "^1.6.6",
     "react": "^18.2.0",
+    "react-calendar": "^4.8.0",
+    "react-datepicker": "^5.0.0",
     "react-dom": "^18.2.0",
+    "react-draft-wysiwyg": "^1.15.0",
+    "react-markdown": "^9.0.1",
     "react-modal": "^3.16.1",
-    "react-router-dom": "^6.21.0"
+    "react-quill": "^2.0.0",
+    "react-quill-image-uploader": "^0.1.1",
+    "react-router-dom": "^6.21.0",
+    "slate": "^0.101.4",
+    "slate-react": "^0.101.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
