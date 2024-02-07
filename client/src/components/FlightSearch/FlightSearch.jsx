@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import axios from 'axios'; // Import Axios
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import styles from './FlightSearch.module.scss';
 import departure from '../../images/departure.svg';
 import search from '../../images/fi-rr-search.svg';
+import SearchResult from './SearchResult/SearchResult';
 
 const FlightSearch = () => {
   const [showSteppers, setShowSteppers] = useState(false);
@@ -11,7 +12,32 @@ const FlightSearch = () => {
   const [departDate, setDepartDate] = useState('');
   const [departureAirport, setDepartureAirport] = useState('');
   const [arrivalAirport, setArrivalAirport] = useState('');
-  const [searchResult, setSearchResult] = useState(null); // State to store the response data
+  const [searchResult, setSearchResult] = useState(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const departureAirportParam = params.get('departureAirport') || '';
+    const arrivalAirportParam = params.get('arrivalAirport') || '';
+    const departDateParam = params.get('departDate') || '';
+    const adultsParam = parseInt(params.get('adults')) || 1;
+    const childrenParam = parseInt(params.get('children')) || 0;
+
+    setDepartureAirport(departureAirportParam);
+    setArrivalAirport(arrivalAirportParam);
+    setDepartDate(departDateParam);
+    setAdults(adultsParam);
+    setChildren(childrenParam);
+
+    const savedSearchResult = JSON.parse(localStorage.getItem('searchResult'));
+    if (
+      savedSearchResult &&
+      departureAirportParam &&
+      arrivalAirportParam &&
+      departDateParam
+    ) {
+      setSearchResult(savedSearchResult);
+    }
+  }, []);
 
   const handleAdultsChange = (newCount) => {
     setAdults(newCount < 0 ? 0 : newCount);
@@ -22,7 +48,7 @@ const FlightSearch = () => {
   };
 
   const handleCountButtonClick = (event) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
     setShowSteppers(!showSteppers);
   };
 
@@ -41,7 +67,11 @@ const FlightSearch = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    // Make the GET request using Axios
+    if (!departureAirport || !arrivalAirport || !departDate) {
+      console.error('Please fill in all fields before submitting');
+      return;
+    }
+
     try {
       const response = await axios.get(
         'http://localhost:5001/api/flights/result',
@@ -56,11 +86,24 @@ const FlightSearch = () => {
       );
 
       setSearchResult(response.data);
-      console.log(); // Store the response data in state
+
+      const searchParams = new URLSearchParams();
+      searchParams.set('departureAirport', departureAirport);
+      searchParams.set('arrivalAirport', arrivalAirport);
+      searchParams.set('departDate', departDate);
+      searchParams.set('adults', adults.toString());
+      searchParams.set('children', children.toString());
+      window.history.pushState(null, null, `?${searchParams.toString()}`);
+
+      // Сохраняем результаты поиска в localStorage только если они существуют
+      if (response.data) {
+        localStorage.setItem('searchResult', JSON.stringify(response.data));
+      }
     } catch (error) {
       console.error('Error making the request:', error);
     }
   };
+
   return (
     <div className={styles.wrapper}>
       <form className={styles.searchPanel} onSubmit={handleFormSubmit}>
@@ -132,45 +175,11 @@ const FlightSearch = () => {
           </button>
         </div>
       </form>
-      <div>
-        {searchResult && (
-          <div className={styles.result}>
-            <p>Search Result:</p>
-            {searchResult.flights.map((flight, index) => (
-              <div key={index}>
-                {flight.direct !== false ? (
-                  // Display details for direct flight
-                  <>
-                    <p>Flight Number: {flight.flightNumber}</p>
-                    <p>Aircraft: {flight.aircraft}</p>
-                    <p>Departure Airport: {flight.departureAirport}</p>
-                    <p>Arrival Airport: {flight.arrivalAirport}</p>
-                    <p>Departure Time: {flight.departureTime}</p>
-                    <p>Arrival Time: {flight.arrivalTime}</p>
-                  </>
-                ) : (
-                  // Display details for flights with legs
-                  <>
-                    <p>-----------------------------</p>
-                    <p>Connecting Flight:</p>
-                    {flight.legs.map((leg, legIndex) => (
-                      <div key={legIndex}>
-                        <p>Type: {leg.type}</p>
-                        <p>Flight Number: {leg.flight.flightNumber}</p>
-                        <p>Aircraft: {leg.flight.aircraft}</p>
-                        <p>Departure Airport: {leg.flight.departureAirport}</p>
-                        <p>Arrival Airport: {leg.flight.arrivalAirport}</p>
-                        <p>Departure Time: {leg.flight.departureTime}</p>
-                        <p>Arrival Time: {leg.flight.arrivalTime}</p>
-                        {/* Add more details as needed */}
-                      </div>
-                    ))}
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+      <div className={styles.container}>
+        <div className={styles.searchFilters}>Search filters</div>
+        <div>
+          {searchResult && <SearchResult searchResult={searchResult} />}
+        </div>
       </div>
     </div>
   );

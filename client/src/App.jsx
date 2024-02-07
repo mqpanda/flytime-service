@@ -11,6 +11,7 @@ import MyPostsPage from './pages/MyPosts/MyPostsPage';
 import BlogPost from './components/Blog/BlogPost/BlogPost';
 import EditPostPage from './pages/EditPostPage/EditPostPage';
 import Footer from './components/Footer/Footer';
+import FlightSearch from './components/FlightSearch/FlightSearch';
 
 const App = () => {
   return (
@@ -19,12 +20,13 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<Blog />} />
-        <Route path="/search-result" element={<SearchResult />} />
         <Route path="/register" element={<Register />} />
         <Route path="/my-posts" element={<MyPostsPage />} />
         <Route path="/new-post" element={<NewPostPage />} />
         <Route path="/blog/:postId" element={<BlogPost />} />
         <Route path="/edit-post/:id" element={<EditPostPage />} />
+        <Route path="/" element={<FlightSearch />} />
+        <Route path="/results" element={<SearchResult />} />
       </Routes>
       <Footer />
     </Router>

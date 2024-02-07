@@ -1,4 +1,5 @@
 import FlightSearch from '../../components/FlightSearch/FlightSearch';
+
 import styles from './Home.module.scss';
 
 const Home = () => {

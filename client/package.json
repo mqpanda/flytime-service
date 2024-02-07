@@ -21,7 +21,7 @@
     "react-modal": "^3.16.1",
     "react-quill": "^2.0.0",
     "react-quill-image-uploader": "^0.1.1",
-    "react-router-dom": "^6.21.0",
+    "react-router-dom": "^6.22.0",
     "slate": "^0.101.4",
     "slate-react": "^0.101.3"
   },
