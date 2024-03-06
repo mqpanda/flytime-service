@@ -9,6 +9,7 @@ const flightSchema = new mongoose.Schema({
   arrivalTime: { type: Date, required: true },
   totalSeats: { type: Number, required: true },
   occupiedSeats: { type: Number, default: 0 },
+  price: { type: Number, default: 0 },
 });
 
 const Flight = mongoose.model('Flight', flightSchema);

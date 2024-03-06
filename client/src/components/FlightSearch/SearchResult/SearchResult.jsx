@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import departure from '../../../images/departure.svg';
 import arrow from '../../../images/arrow.svg';
 import alarm from '../../../images/alarm.svg';
+import arrowStop from '../../../images/Component2.svg';
 
 const SearchResult = ({ searchResult }) => {
   const formatTime = (timeString) => {
@@ -28,13 +29,38 @@ const SearchResult = ({ searchResult }) => {
     return `${formattedDate} (${dayOfWeek})`;
   };
 
+  const calculateTotalPrice = (flight) => {
+    let totalPrice = 0;
+
+    if (flight.direct !== false) {
+      // For direct flights, simply sum up the price
+      totalPrice = flight.price;
+    } else {
+      // For flights with legs, sum up the price of each leg
+      for (const leg of flight.legs) {
+        totalPrice += leg.flight.price;
+      }
+    }
+
+    return totalPrice;
+  };
+
   const calculateFlightDuration = (departureTime, arrivalTime) => {
     const departure = new Date(departureTime);
     const arrival = new Date(arrivalTime);
     const duration = arrival - departure; // Difference in milliseconds
     const hours = Math.floor(duration / (1000 * 60 * 60));
     const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}min`;
+    return `${hours}h ${minutes}`;
+  };
+
+  const calculateTransferTime = (legs) => {
+    const firstArrival = new Date(legs[0].flight.arrivalTime);
+    const secondDeparture = new Date(legs[1].flight.departureTime);
+    const waitingTime = secondDeparture - firstArrival; // Difference in milliseconds
+    const hours = Math.floor(waitingTime / (1000 * 60 * 60));
+    const minutes = Math.floor((waitingTime % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}`;
   };
 
   return (
@@ -63,7 +89,7 @@ const SearchResult = ({ searchResult }) => {
                       )}
                     </div>
                     <img src={arrow} alt="" />
-                    <div className={styles.flightDuration}>direct</div>
+                    <div className={styles.flightDuration}>Direct</div>
                   </div>
                   <div>
                     <img src={departure} alt="departure" />
@@ -75,49 +101,58 @@ const SearchResult = ({ searchResult }) => {
                   <p>{formatDate(flight.arrivalTime)}</p>
                 </div>
                 <div>DIRECT</div>
-                <div>PRICE</div>
+                <div>{calculateTotalPrice(flight)}$</div>
               </div>
-              <div className={styles.infoElement}>info airlines</div>
+              <div className={styles.infoElement}>Info airlines</div>
             </>
           ) : (
             // Display details for flights with legs
-            <>
-              {flight.legs.map((leg, legIndex) => (
-                <div key={legIndex} className={styles.resultElementInfo}>
-                  <div>
-                    <p>{leg.flight.departureAirport}</p>
-                    <p>{formatTime(leg.flight.departureTime)}</p>
-                    <p>{formatDate(leg.flight.departureTime)}</p>
-                  </div>
-                  <div className={styles.travelInfo}>
-                    <div>
-                      <img src={departure} alt="departure" />
-                    </div>
-                    <div className={styles.flightInfo}>
-                      <div className={styles.flightDuration}>
-                        <img src={alarm} alt="alarm" />
-                        {calculateFlightDuration(
-                          leg.flight.departureTime,
-                          leg.flight.arrivalTime
-                        )}
-                      </div>
-                      <img src={arrow} alt="" />
-                      <div className={styles.flightDuration}>direct</div>
-                    </div>
-                    <div>
-                      <img src={departure} alt="departure" />
-                    </div>
-                  </div>
-                  <div>
-                    <p>{leg.flight.arrivalAirport}</p>
-                    <p>{formatTime(leg.flight.arrivalTime)}</p>
-                    <p>{formatDate(leg.flight.arrivalTime)}</p>
-                  </div>
-                  <div>DIRECT</div>
-                  <div>PRICE</div>
+            <div className={styles.resultElementInfo}>
+              <div>
+                <p>{flight.legs[0].flight.departureAirport}</p>
+                <p>{formatTime(flight.legs[0].flight.departureTime)}</p>
+                <p>{formatDate(flight.legs[0].flight.departureTime)}</p>
+              </div>
+              <div className={styles.travelInfo}>
+                <div>
+                  <img src={departure} alt="departure" />
                 </div>
-              ))}
-            </>
+                <div className={styles.flightInfo}>
+                  <div className={styles.flightDuration}>
+                    <img src={alarm} alt="alarm" />
+                    {calculateFlightDuration(
+                      flight.legs[0].flight.departureTime,
+                      flight.legs[flight.legs.length - 1].flight.arrivalTime
+                    )}
+                  </div>
+                  <img src={arrowStop} alt="" />
+                  <div className={styles.flightDuration}>
+                    {flight.legs[0].flight.arrivalAirport} (
+                    {calculateTransferTime(flight.legs)})
+                  </div>
+                </div>
+                <div>
+                  <img src={departure} alt="departure" />
+                </div>
+              </div>
+              <div>
+                <p>
+                  {flight.legs[flight.legs.length - 1].flight.arrivalAirport}
+                </p>
+                <p>
+                  {formatTime(
+                    flight.legs[flight.legs.length - 1].flight.arrivalTime
+                  )}
+                </p>
+                <p>
+                  {formatDate(
+                    flight.legs[flight.legs.length - 1].flight.arrivalTime
+                  )}
+                </p>
+              </div>
+              <div>1 STOP</div>
+              <div>{calculateTotalPrice(flight)}$</div>
+            </div>
           )}
         </div>
       ))}

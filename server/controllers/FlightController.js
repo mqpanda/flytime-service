@@ -10,6 +10,7 @@ export const createFlight = async (req, res) => {
       departureTime,
       arrivalTime,
       totalSeats,
+      price,
     } = req.body;
 
     const existingFlight = await Flight.findOne({
@@ -19,6 +20,7 @@ export const createFlight = async (req, res) => {
       arrivalAirport,
       departureTime,
       arrivalTime,
+      price,
     });
 
     if (existingFlight) {
@@ -35,6 +37,7 @@ export const createFlight = async (req, res) => {
       departureTime: new Date(departureTime),
       arrivalTime: new Date(arrivalTime),
       totalSeats,
+      price,
     });
 
     const savedFlight = await newFlight.save();
@@ -68,19 +71,27 @@ export const getFlightsByParam = async (req, res) => {
       numberOfPassengers,
     } = req.query;
 
+    const departureDate = new Date(departureTime);
+    const departureDateNextDay = new Date(departureDate);
+    departureDateNextDay.setDate(departureDateNextDay.getDate() + 1);
+    departureDateNextDay.setHours(0, 0, 0, 0);
+
+    const departureDateEndOfDay = new Date(departureDate);
+    departureDateEndOfDay.setHours(23, 59, 59, 999);
+
     const directFilters = {
       departureAirport,
       arrivalAirport,
       departureTime: {
-        $gte: new Date(departureTime),
-        $lt: new Date(departureTime).setHours(23, 59, 59, 999),
+        $gte: departureDate,
+        $lt: departureDateNextDay,
       },
     };
 
     const intermediateAirports = await Flight.distinct('arrivalAirport', {
       departureAirport,
       arrivalAirport: { $ne: arrivalAirport },
-      departureTime: { $gte: new Date(departureTime) },
+      departureTime: { $gte: departureDate },
     });
 
     const timeBetweenFlights = 60 * 60 * 1000; // 1 hour
@@ -98,46 +109,68 @@ export const getFlightsByParam = async (req, res) => {
       const firstLegFilters = {
         departureAirport,
         arrivalAirport: intermediateAirport,
-        departureTime: { $gte: new Date(departureTime) },
+        departureTime: {
+          $gte: departureDate,
+          $lt: departureDateNextDay,
+        },
       };
 
       const firstLegFlights = await Flight.find(firstLegFilters);
 
       for (const firstLegFlight of firstLegFlights) {
+        const nextDayStart = new Date(firstLegFlight.arrivalTime);
+        nextDayStart.setDate(nextDayStart.getDate() + 1);
+        nextDayStart.setHours(0, 0, 0, 0);
+
         const secondLegFilters = {
           departureAirport: intermediateAirport,
           arrivalAirport,
           departureTime: {
-            $gte: new Date(
-              firstLegFlight.arrivalTime.getTime() + timeBetweenFlights
-            ),
-            $lt: new Date(
-              firstLegFlight.arrivalTime.getTime() + 24 * 60 * 60 * 1000
-            ),
+            $gte: new Date(nextDayStart.getTime() + timeBetweenFlights),
+            $lt: new Date(nextDayStart.getTime() + 24 * 60 * 60 * 1000), // Конец текущего дня
           },
         };
 
         const secondLegFlights = await Flight.find(secondLegFilters);
 
-        for (const secondLegFlight of secondLegFlights) {
-          if (
-            secondLegFlight.departureAirport === intermediateAirport &&
-            secondLegFlight.departureTime > firstLegFlight.arrivalTime
-          ) {
-            const totalSeatsAvailable =
-              firstLegFlight.totalSeats -
-              firstLegFlight.occupiedSeats +
-              secondLegFlight.totalSeats -
-              secondLegFlight.occupiedSeats;
+        for (const firstLegFlight of firstLegFlights) {
+          const secondLegFilters = {
+            departureAirport: intermediateAirport,
+            arrivalAirport,
+            departureTime: {
+              $gte: new Date(
+                firstLegFlight.arrivalTime.getTime() + timeBetweenFlights
+              ), // Начало второй пересадки
+              $lte: new Date(
+                firstLegFlight.arrivalTime.getTime() + 24 * 60 * 60 * 1000
+              ), // В течение 24 часов после прибытия первого полета
+            },
+          };
 
-            if (totalSeatsAvailable >= numberOfPassengers) {
-              flights.push({
-                direct: false,
-                legs: [
-                  { flight: firstLegFlight, type: 'firstLeg' },
-                  { flight: secondLegFlight, type: 'secondLeg' },
-                ],
-              });
+          const secondLegFlights = await Flight.find(secondLegFilters);
+
+          for (const secondLegFlight of secondLegFlights) {
+            if (
+              secondLegFlight.departureAirport === intermediateAirport &&
+              secondLegFlight.departureTime > firstLegFlight.arrivalTime
+            ) {
+              const totalSeatsFirstLeg =
+                firstLegFlight.totalSeats - firstLegFlight.occupiedSeats;
+              const totalSeatsSecondLeg =
+                secondLegFlight.totalSeats - secondLegFlight.occupiedSeats;
+
+              if (
+                totalSeatsFirstLeg >= numberOfPassengers &&
+                totalSeatsSecondLeg >= numberOfPassengers
+              ) {
+                flights.push({
+                  direct: false,
+                  legs: [
+                    { flight: firstLegFlight, type: 'firstLeg' },
+                    { flight: secondLegFlight, type: 'secondLeg' },
+                  ],
+                });
+              }
             }
           }
         }

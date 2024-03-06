@@ -5,6 +5,7 @@ import departure from '../../images/departure.svg';
 import search from '../../images/fi-rr-search.svg';
 import SearchResult from './SearchResult/SearchResult';
 
+
 const FlightSearch = () => {
   const [showSteppers, setShowSteppers] = useState(false);
   const [adults, setAdults] = useState(1);
@@ -73,13 +74,14 @@ const FlightSearch = () => {
     }
 
     try {
+      const formattedDepartureTime = new Date(departDate).toISOString(); // Преобразование времени в формат ISO
       const response = await axios.get(
         'http://localhost:5001/api/flights/result',
         {
           params: {
             departureAirport,
             arrivalAirport,
-            departureTime: departDate,
+            departureTime: formattedDepartureTime, // Передача времени в формате ISO
             numberOfPassengers: adults + children,
           },
         }
@@ -147,21 +149,33 @@ const FlightSearch = () => {
             <div className={styles.steppers}>
               <div>
                 Adults:
-                <button onClick={() => handleAdultsChange(adults - 1)}>
+                <button
+                  type="button"
+                  onClick={() => handleAdultsChange(adults - 1)}
+                >
                   -
                 </button>
                 {adults}
-                <button onClick={() => handleAdultsChange(adults + 1)}>
+                <button
+                  type="button"
+                  onClick={() => handleAdultsChange(adults + 1)}
+                >
                   +
                 </button>
               </div>
               <div>
                 Minors:
-                <button onClick={() => handleChildrenChange(children - 1)}>
+                <button
+                  type="button"
+                  onClick={() => handleChildrenChange(children - 1)}
+                >
                   -
                 </button>
                 {children}
-                <button onClick={() => handleChildrenChange(children + 1)}>
+                <button
+                  type="button"
+                  onClick={() => handleChildrenChange(children + 1)}
+                >
                   +
                 </button>
               </div>
