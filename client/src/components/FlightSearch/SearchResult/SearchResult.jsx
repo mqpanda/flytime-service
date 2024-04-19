@@ -1,11 +1,15 @@
-import styles from './SearchResult.module.scss';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import styles from './SearchResult.module.scss';
 import departure from '../../../images/departure.svg';
 import arrow from '../../../images/arrow.svg';
 import alarm from '../../../images/alarm.svg';
 import arrowStop from '../../../images/Component2.svg';
 
 const SearchResult = ({ searchResult }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState(null);
+
   const formatTime = (timeString) => {
     const date = new Date(timeString);
     const hours = date.getHours();
@@ -14,6 +18,7 @@ const SearchResult = ({ searchResult }) => {
     const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
     return `${formattedHours}h ${minutes}min ${ampm}`;
   };
+
   const formatDate = (dateString) => {
     const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const date = new Date(dateString);
@@ -33,10 +38,8 @@ const SearchResult = ({ searchResult }) => {
     let totalPrice = 0;
 
     if (flight.direct !== false) {
-      // For direct flights, simply sum up the price
       totalPrice = flight.price;
     } else {
-      // For flights with legs, sum up the price of each leg
       for (const leg of flight.legs) {
         totalPrice += leg.flight.price;
       }
@@ -48,7 +51,7 @@ const SearchResult = ({ searchResult }) => {
   const calculateFlightDuration = (departureTime, arrivalTime) => {
     const departure = new Date(departureTime);
     const arrival = new Date(arrivalTime);
-    const duration = arrival - departure; // Difference in milliseconds
+    const duration = arrival - departure;
     const hours = Math.floor(duration / (1000 * 60 * 60));
     const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}`;
@@ -57,18 +60,31 @@ const SearchResult = ({ searchResult }) => {
   const calculateTransferTime = (legs) => {
     const firstArrival = new Date(legs[0].flight.arrivalTime);
     const secondDeparture = new Date(legs[1].flight.departureTime);
-    const waitingTime = secondDeparture - firstArrival; // Difference in milliseconds
+    const waitingTime = secondDeparture - firstArrival;
     const hours = Math.floor(waitingTime / (1000 * 60 * 60));
     const minutes = Math.floor((waitingTime % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}`;
   };
 
+  const openModal = (flight) => {
+    setSelectedFlight(flight);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setSelectedFlight(null);
+    setShowModal(false);
+  };
+
   return (
     <div className={styles.result}>
       {searchResult.flights.map((flight, index) => (
-        <div key={index} className={styles.resultElement}>
+        <div
+          key={index}
+          className={styles.resultElement}
+          onClick={() => openModal(flight)}
+        >
           {flight.direct !== false ? (
-            // Display details for direct flight
             <>
               <div className={styles.resultElementInfo}>
                 <div>
@@ -106,7 +122,6 @@ const SearchResult = ({ searchResult }) => {
               <div className={styles.infoElement}>Info airlines</div>
             </>
           ) : (
-            // Display details for flights with legs
             <div className={styles.resultElementInfo}>
               <div>
                 <p>{flight.legs[0].flight.departureAirport}</p>
@@ -156,6 +171,19 @@ const SearchResult = ({ searchResult }) => {
           )}
         </div>
       ))}
+
+      {showModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            {selectedFlight && (
+              <div>
+                <p>{selectedFlight.departureAirport}</p>
+              </div>
+            )}
+            <button onClick={closeModal}>Close Modal</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -188,4 +216,5 @@ SearchResult.propTypes = {
     ),
   }),
 };
+
 export default SearchResult;

@@ -7,13 +7,13 @@ import PassengerRoutes from './routes/PassengerRoutes.js';
 import AdminRoutes from './routes/AdminRoutes.js';
 import AirCarrierRoutes from './routes/AirCarrierRoutes.js';
 import FlightRoutes from './routes/FlightRoutes.js';
+import BookingRoutes from './routes/BookingRoutes.js';
 
 dotenv.config();
 
 // Запуск DB: mongod --dbpath ~/data/db
 
 const app = express();
-
 
 app.use(cors());
 
@@ -37,6 +37,7 @@ app.use(PassengerRoutes);
 app.use(AdminRoutes);
 app.use(AirCarrierRoutes);
 app.use(FlightRoutes);
+app.use(BookingRoutes);
 
 const PORT = process.env.PORT || 7001;
 

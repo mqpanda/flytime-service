@@ -5,7 +5,6 @@ import departure from '../../images/departure.svg';
 import search from '../../images/fi-rr-search.svg';
 import SearchResult from './SearchResult/SearchResult';
 
-
 const FlightSearch = () => {
   const [showSteppers, setShowSteppers] = useState(false);
   const [adults, setAdults] = useState(1);

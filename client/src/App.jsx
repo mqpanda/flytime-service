@@ -10,6 +10,7 @@ import NewPostPage from './pages/NewPost/NewPostPage';
 import MyPostsPage from './pages/MyPosts/MyPostsPage';
 import BlogPost from './components/Blog/BlogPost/BlogPost';
 import EditPostPage from './pages/EditPostPage/EditPostPage';
+import ProfilePage from './pages/Profile/ProfilePage';
 import Footer from './components/Footer/Footer';
 import FlightSearch from './components/FlightSearch/FlightSearch';
 
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/edit-post/:id" element={<EditPostPage />} />
         <Route path="/" element={<FlightSearch />} />
         <Route path="/results" element={<SearchResult />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       <Footer />
     </Router>

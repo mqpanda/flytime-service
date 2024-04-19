@@ -1,0 +1,79 @@
+/* Modal.module.scss */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @media (max-width: 950px) {
+    z-index: 4;
+  }
+}
+
+.modal {
+  background: white;
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  overflow: auto;
+  position: relative;
+  width: 660px;
+  height: 350px;
+}
+
+.closeButton {
+  position: absolute;
+  top: 35px;
+  right: 30px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 0;
+  background-color: #fff;
+}
+
+.content {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.addButton {
+  margin-top: 20px;
+}
+
+.inputField {
+  margin: 0 auto;
+  width: 500px;
+  height: 30px;
+  border-radius: 12px;
+  border: 1px #ebeef1 solid;
+  margin-bottom: 10px;
+  box-shadow: 1px 1px 10px 0px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--grey-1, #646b83);
+  font-family: Nunito Sans;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  padding: 0 20px;
+}
+
+.button {
+  font-family: 'Nunito Sans', sans-serif;
+  background-color: #000000;
+  color: #ffffff;
+  width: 540px;
+  height: 48px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  cursor: pointer;
+}

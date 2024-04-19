@@ -7,9 +7,14 @@ const router = express.Router();
 router.post('/api/passenger', checkAuth, PassengerController.createPassenger);
 router.get('/api/passenger', checkAuth, PassengerController.getAllPassengers);
 router.get(
-  '/api/passenger/:passengerId',
+  '/api/passenger/flight/:passengerId',
   checkAuth,
   PassengerController.getOnePassenger
+);
+router.get(
+  '/api/passenger/:accountId',
+  checkAuth,
+  PassengerController.getPassengersByAccountId
 );
 router.delete(
   '/api/passenger/:passengerId',

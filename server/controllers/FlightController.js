@@ -62,6 +62,23 @@ export const getFlights = async (req, res) => {
   }
 };
 
+export const getFlightById = async (req, res) => {
+  try {
+    const flightId = req.params.id; // предполагая, что id передается в параметрах маршрута
+
+    const flight = await Flight.findById(flightId);
+
+    if (!flight) {
+      return res.status(404).json({ message: 'Flight not found' });
+    }
+
+    res.status(200).json({ flight });
+  } catch (error) {
+    console.error('Error getting flight by ID:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 export const getFlightsByParam = async (req, res) => {
   try {
     const {

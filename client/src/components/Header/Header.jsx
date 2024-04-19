@@ -100,10 +100,10 @@ const Header = () => {
         password: password,
       });
 
-      const { token, role } = response.data;
-
+      const { token, role, _id } = response.data; // Изменил account_id на _id
       localStorage.setItem('token', token);
-      localStorage.setItem('userRole', role); // Set user's role in local storage
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('accountId', _id); // Изменил сохранение в localStorage
 
       setAuthenticated(true);
       setUserRole(role);
@@ -112,12 +112,15 @@ const Header = () => {
       console.error('Login failed:', error.message);
     }
   };
-
   const handleLogout = () => {
+    // Remove token and other relevant data from localStorage
     localStorage.removeItem('token');
-    setAuthenticated(false);
-  };
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('accountId');
 
+    // Redirect to the homepage or another appropriate page
+    window.location.href = '/'; // Redirect to the homepage
+  };
   const toggleMode = () => {
     setRegisterMode((prevMode) => !prevMode);
     setNotification(null);
@@ -175,7 +178,9 @@ const Header = () => {
           {isAuthenticated && (
             <li>
               <button className={styles.profile}>
-                <li>Profile</li>
+                <li>
+                  <Link to="/profile">Profile</Link>
+                </li>
               </button>
             </li>
           )}

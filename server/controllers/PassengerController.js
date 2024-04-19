@@ -86,6 +86,23 @@ export const getAllPassengers = async (req, res) => {
   }
 };
 
+export const getPassengersByAccountId = async (req, res) => {
+  const accountId = req.params.accountId; // Assuming the account ID is passed in the request params
+
+  try {
+    const account = await Account.findById(accountId).populate('passengers');
+
+    if (!account) {
+      return res.status(404).json({ message: 'Account not found' });
+    }
+
+    res.status(200).json(account.passengers);
+  } catch (error) {
+    console.error('Error fetching passengers by account ID:', error);
+    res.status(500).json({ message: 'Error fetching passengers' });
+  }
+};
+
 export const deletePassenger = async (req, res) => {
   const passengerId = req.params.passengerId;
 

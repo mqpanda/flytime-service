@@ -13,5 +13,6 @@ router.post(
 
 router.get('/api/flights', FlightController.getFlights);
 router.get('/api/flights/result', FlightController.getFlightsByParam);
+router.get('/api/flights/:id', FlightController.getFlightById);
 
 export default router;

@@ -1,0 +1,30 @@
+// BookingList.module.scss
+
+.booking-list-container {
+  max-width: 800px;
+}
+
+.booking-list-header {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.booking-list {
+  list-style: none;
+  padding: 0;
+}
+
+.booking-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.booking-item-info {
+  margin-bottom: 5px;
+}
+
+.loading {
+  font-style: italic;
+  color: #666;
+}
