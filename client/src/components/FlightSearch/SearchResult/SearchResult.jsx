@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styles from './SearchResult.module.scss';
 import departure from '../../../images/departure.svg';
@@ -9,6 +9,38 @@ import arrowStop from '../../../images/Component2.svg';
 const SearchResult = ({ searchResult }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState(null);
+  const [availableSeats, setAvailableSeats] = useState([]);
+  const [occupiedSeats, setOccupiedSeats] = useState([]);
+  useEffect(() => {
+    const fetchFlightData = async () => {
+      if (selectedFlight) {
+        try {
+          const response = await fetch(
+            `http://localhost:5001/api/flights/${selectedFlight._id}`
+          );
+          const data = await response.json();
+          setAvailableSeats(
+            Array.from(
+              { length: data.flight.totalSeats },
+              (_, index) => index + 1
+            )
+          );
+
+          // Fetch occupied seats information
+          const occupiedResponse = await fetch(
+            `http://localhost:5001/api/flights/bookings/occupied-seats/${selectedFlight._id}`
+          );
+          const occupiedData = await occupiedResponse.json();
+          console.log('Occupied Seats:', occupiedData);
+          setOccupiedSeats(occupiedData.occupiedSeats);
+        } catch (error) {
+          console.error('Error fetching flight data:', error);
+        }
+      }
+    };
+
+    fetchFlightData();
+  }, [selectedFlight]);
 
   const formatTime = (timeString) => {
     const date = new Date(timeString);
@@ -74,6 +106,16 @@ const SearchResult = ({ searchResult }) => {
   const closeModal = () => {
     setSelectedFlight(null);
     setShowModal(false);
+  };
+
+  const handleSeatClick = (seatNumber) => {
+    const seatString = String(seatNumber);
+    if (occupiedSeats.includes(seatString)) {
+      console.log(`Место ${seatString} уже занято.`);
+    } else {
+      console.log('Место успешно выбрано:', seatString);
+      // Здесь можно добавить дополнительную логику для выбора места
+    }
   };
 
   return (
@@ -175,11 +217,35 @@ const SearchResult = ({ searchResult }) => {
       {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
-            {selectedFlight && (
-              <div>
-                <p>{selectedFlight.departureAirport}</p>
-              </div>
-            )}
+            <h2>Available Seats for Flight {selectedFlight.flightNumber}</h2>
+            <div className={styles.seatsContainer}>
+              {[...Array(Math.ceil(availableSeats.length / 6)).keys()].map(
+                (rowIndex) => (
+                  <div key={rowIndex} className={styles.seatRow}>
+                    {availableSeats
+                      .slice(rowIndex * 6, rowIndex * 6 + 6)
+                      .map((seatNumber) => (
+                        <button
+                          key={seatNumber}
+                          className={`${styles.seat} ${
+                            occupiedSeats.includes(String(seatNumber)) // Преобразуем номер места в строку
+                              ? styles.occupiedSeat
+                              : ''
+                          }`}
+                          onClick={
+                            () =>
+                              !occupiedSeats.includes(String(seatNumber)) && // Преобразуем номер места в строку
+                              handleSeatClick(String(seatNumber)) // Преобразуем номер места в строку при передаче в функцию
+                          }
+                          disabled={occupiedSeats.includes(String(seatNumber))} // Преобразуем номер места в строку
+                        >
+                          {seatNumber}
+                        </button>
+                      ))}
+                  </div>
+                )
+              )}
+            </div>
             <button onClick={closeModal}>Close Modal</button>
           </div>
         </div>

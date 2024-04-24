@@ -1,6 +1,5 @@
 import Booking from '../models/Booking.js';
 import Flight from '../models/Flight.js';
-import Passenger from '../models/Passenger.js';
 
 export const bookSeat = async (req, res) => {
   try {
