@@ -13,8 +13,8 @@ const Profile = () => {
 
   return (
     <div className={styles.container}>
-      <PassengerList></PassengerList>
       <BookingList></BookingList>
+      <PassengerList></PassengerList>
     </div>
   );
 };

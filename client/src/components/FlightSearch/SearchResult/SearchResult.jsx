@@ -5,6 +5,7 @@ import departure from '../../../images/departure.svg';
 import arrow from '../../../images/arrow.svg';
 import alarm from '../../../images/alarm.svg';
 import arrowStop from '../../../images/Component2.svg';
+import axios from 'axios';
 
 const SearchResult = ({ searchResult }) => {
   const [showModal, setShowModal] = useState(false);
@@ -13,6 +14,35 @@ const SearchResult = ({ searchResult }) => {
   const [occupiedSeats, setOccupiedSeats] = useState([]);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [passengerIdInput, setPassengerIdInput] = useState('');
+  const [passengers, setPassengers] = useState([]); // Состояние для хранения пассажиро
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingError, setBookingError] = useState(null);
+
+  useEffect(() => {
+    fetchPassengers();
+  }, []);
+
+  const fetchPassengers = async () => {
+    try {
+      const accountId = localStorage.getItem('accountId');
+      const token = localStorage.getItem('token');
+      if (!accountId || !token) {
+        throw new Error('Account ID or token not found in local storage');
+      }
+
+      const response = await axios.get(
+        `http://localhost:5001/api/passenger/${accountId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setPassengers(response.data);
+    } catch (error) {
+      console.error('Error fetching passengers:', error.message);
+    }
+  };
 
   // Получаем accountId из localStorage
   const accountId = localStorage.getItem('accountId');
@@ -144,9 +174,12 @@ const SearchResult = ({ searchResult }) => {
         );
         if (response.ok) {
           console.log('Бронь успешно создана');
-          // Здесь можно добавить дополнительную логику после успешного создания брони
+          setBookingSuccess(true);
         } else {
           console.error('Ошибка при создании брони:', response.statusText);
+          setBookingError(
+            'Ошибка при создании брони. Пожалуйста, попробуйте еще раз.'
+          );
         }
       } catch (error) {
         console.error('Ошибка при создании брони:', error);
@@ -256,11 +289,18 @@ const SearchResult = ({ searchResult }) => {
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <h2>Available Seats for Flight {selectedFlight.flightNumber}</h2>
-            <input
-              type="text"
+
+            <select
               value={passengerIdInput}
               onChange={(e) => setPassengerIdInput(e.target.value)}
-            />
+            >
+              <option value="">Выберите пассажира</option>
+              {passengers.map((passenger) => (
+                <option key={passenger._id} value={passenger._id}>
+                  {passenger.last_name} {passenger.first_name}
+                </option>
+              ))}
+            </select>
             <div className={styles.seatsContainer}>
               {[...Array(Math.ceil(availableSeats.length / 6)).keys()].map(
                 (rowIndex) => (
@@ -289,7 +329,12 @@ const SearchResult = ({ searchResult }) => {
                 )
               )}
             </div>
-            <button onClick={handleConfirmBooking}>Book</button>
+            {bookingSuccess && <div>Бронь успешно создана!</div>}
+            {bookingError && <div className={styles.error}>{bookingError}</div>}
+
+            <button className={styles.close} onClick={handleConfirmBooking}>
+              Book
+            </button>
             <button className={styles.close} onClick={closeModal}>
               Close Modal
             </button>
