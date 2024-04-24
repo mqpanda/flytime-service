@@ -11,6 +11,12 @@ const SearchResult = ({ searchResult }) => {
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [availableSeats, setAvailableSeats] = useState([]);
   const [occupiedSeats, setOccupiedSeats] = useState([]);
+  const [selectedSeat, setSelectedSeat] = useState(null);
+  const [passengerIdInput, setPassengerIdInput] = useState('');
+
+  // Получаем accountId из localStorage
+  const accountId = localStorage.getItem('accountId');
+
   useEffect(() => {
     const fetchFlightData = async () => {
       if (selectedFlight) {
@@ -114,7 +120,39 @@ const SearchResult = ({ searchResult }) => {
       console.log(`Место ${seatString} уже занято.`);
     } else {
       console.log('Место успешно выбрано:', seatString);
-      // Здесь можно добавить дополнительную логику для выбора места
+      setSelectedSeat(seatString);
+    }
+  };
+
+  const handleConfirmBooking = async () => {
+    if (selectedSeat) {
+      try {
+        const response = await fetch(
+          'http://localhost:5001/api/flight/booking',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              flightId: selectedFlight._id,
+              passengerId: passengerIdInput,
+              accountId: accountId,
+              seatNumber: selectedSeat,
+            }),
+          }
+        );
+        if (response.ok) {
+          console.log('Бронь успешно создана');
+          // Здесь можно добавить дополнительную логику после успешного создания брони
+        } else {
+          console.error('Ошибка при создании брони:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Ошибка при создании брони:', error);
+      }
+    } else {
+      console.log('Выберите место перед бронированием');
     }
   };
 
@@ -218,6 +256,11 @@ const SearchResult = ({ searchResult }) => {
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <h2>Available Seats for Flight {selectedFlight.flightNumber}</h2>
+            <input
+              type="text"
+              value={passengerIdInput}
+              onChange={(e) => setPassengerIdInput(e.target.value)}
+            />
             <div className={styles.seatsContainer}>
               {[...Array(Math.ceil(availableSeats.length / 6)).keys()].map(
                 (rowIndex) => (
@@ -246,7 +289,10 @@ const SearchResult = ({ searchResult }) => {
                 )
               )}
             </div>
-            <button onClick={closeModal}>Close Modal</button>
+            <button onClick={handleConfirmBooking}>Book</button>
+            <button className={styles.close} onClick={closeModal}>
+              Close Modal
+            </button>
           </div>
         </div>
       )}

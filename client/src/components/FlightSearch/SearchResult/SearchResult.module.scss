@@ -76,15 +76,15 @@
 }
 
 .seat {
-  width: 20px; /* Adjust width to fit 6 seats in a row */
-  height: 20px;
+  width: 24px; /* Adjust width to fit 6 seats in a row */
+  height: 24px;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   border-radius: 4px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: 12px;
   margin: 5px; /* Add margin between seats */
   cursor: pointer;
 }
@@ -95,4 +95,15 @@
   pointer-events: none;
 
   cursor: not-allowed;
+}
+
+.close {
+  height: 40px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+
+  font-size: 12px;
+  margin: 5px; /* Add margin between seats */
+  cursor: pointer;
 }
