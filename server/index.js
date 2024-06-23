@@ -8,6 +8,7 @@ import AdminRoutes from './routes/AdminRoutes.js';
 import AirCarrierRoutes from './routes/AirCarrierRoutes.js';
 import FlightRoutes from './routes/FlightRoutes.js';
 import BookingRoutes from './routes/BookingRoutes.js';
+import OtherRoutes from './routes/OtherRoutes.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use(AdminRoutes);
 app.use(AirCarrierRoutes);
 app.use(FlightRoutes);
 app.use(BookingRoutes);
+app.use(OtherRoutes);
 
 const PORT = process.env.PORT || 7001;
 

@@ -14,8 +14,10 @@
 
     .resultElementInfo {
       display: flex;
-
       justify-content: space-between;
+      margin-top: 20px;
+      margin-left: 20px;
+      width: 900px;
 
       .travelInfo {
         display: flex;
@@ -106,4 +108,98 @@
   font-size: 12px;
   margin: 5px; /* Add margin between seats */
   cursor: pointer;
+}
+
+.directModalContent {
+  select {
+    width: 300px;
+    height: 35px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .seat:nth-child(4) {
+    margin-top: 30px;
+  }
+
+  .btnBlock {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    button {
+      width: 200px;
+    }
+  }
+}
+
+.transferModalContent {
+  select {
+    width: 300px;
+    height: 35px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+}
+
+.departureAirport {
+  font-size: 18px;
+}
+
+.departureTime {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.departureDate {
+  font-size: 14px;
+}
+
+.flagBlock {
+  display: flex;
+}
+
+.aLeft {
+  padding-left: 10px;
+  text-align: left;
+}
+
+.stop {
+  display: flex;
+  align-items: center;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #a44546;
+}
+
+.firstPrice {
+  font-size: 18px;
+  color: #616161;
+  text-decoration: line-through;
+}
+
+.footerResult {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.aCenter {
+  display: flex;
+  align-items: center;
+  color: #7a7a7a;
+}
+
+.footerResult {
+  margin-top: 80px;
+}
+
+.pr40 {
+  padding-right: 40px;
 }

@@ -7,7 +7,8 @@ const router = express.Router();
 
 router.post(
   '/api/flight',
-
+  checkAuth,
+  checkUserRole(['air carrier', 'admin']),
   FlightController.createFlight
 );
 

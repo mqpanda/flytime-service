@@ -33,12 +33,17 @@ router.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
 router.post(
   '/api/post/add',
   checkAuth,
-  checkUserRole(['air carrier', 'user', 'admin']),
+  checkUserRole(['air carrier', 'admin']),
   upload.single('imageUrl'),
   PostController.create
 );
 
-router.get('/api/posts-by-account', checkAuth, getPostsByAccount);
+router.get(
+  '/api/posts-by-account',
+  checkAuth,
+  checkUserRole(['air carrier', 'admin']),
+  getPostsByAccount
+);
 
 router.get('/api/posts', PostController.getAllPosts);
 
@@ -46,12 +51,17 @@ router.get('/api/posts/:id', PostController.getPostById);
 
 router.post('/api/posts/:id/views', PostController.increaseViews);
 
-router.delete('/api/posts/:id', deletePostById);
+router.delete(
+  '/api/posts/:id',
+  checkAuth,
+  checkUserRole(['air carrier', 'admin']),
+  deletePostById
+);
 
 router.put(
   '/api/posts/:id',
   checkAuth,
-  checkUserRole(['air carrier', 'user', 'admin']),
+  checkUserRole(['air carrier', 'admin']),
   upload.single('imageUrl'),
   updatePostById
 );

@@ -4,8 +4,55 @@ import styles from './FlightSearch.module.scss';
 import departure from '../../images/departure.svg';
 import search from '../../images/fi-rr-search.svg';
 import SearchResult from './SearchResult/SearchResult';
+import plus from '../../images/s.png';
+import minus from '../../images/minus.png';
 
 const FlightSearch = () => {
+  const [sorting, setSorting] = useState('');
+  const [seatClass, setSeatClass] = useState('');
+  const [stops, setStops] = useState('');
+  const [price, setPrice] = useState('');
+  const [airlines, setAirlines] = useState('');
+  const [isSortingDropdownOpen, setIsSortingDropdownOpen] = useState(false);
+  const [isSeatClassDropdownOpen, setIsSeatClassDropdownOpen] = useState(false);
+  const [isStopsDropdownOpen, setIsStopsDropdownOpen] = useState(false);
+  const [isPriceDropdownOpen, setIsPriceDropdownOpen] = useState(false);
+  const [isAirlinesDropdownOpen, setIsAirlinesDropdownOpen] = useState(false);
+
+  const handleSortingClick = () =>
+    setIsSortingDropdownOpen(!isSortingDropdownOpen);
+  const handleSeatClassClick = () =>
+    setIsSeatClassDropdownOpen(!isSeatClassDropdownOpen);
+  const handleStopsClick = () => setIsStopsDropdownOpen(!isStopsDropdownOpen);
+  const handlePriceClick = () => setIsPriceDropdownOpen(!isPriceDropdownOpen);
+  const handleAirlinesClick = () =>
+    setIsAirlinesDropdownOpen(!isAirlinesDropdownOpen);
+
+  const handleSortingChange = (value) => {
+    setSorting(value);
+    setIsSortingDropdownOpen(false);
+  };
+
+  const handleSeatClassChange = (value) => {
+    setSeatClass(value);
+    setIsSeatClassDropdownOpen(false);
+  };
+
+  const handleStopsChange = (value) => {
+    setStops(value);
+    setIsStopsDropdownOpen(false);
+  };
+
+  const handlePriceChange = (value) => {
+    setPrice(value);
+    setIsPriceDropdownOpen(false);
+  };
+
+  const handleAirlinesChange = (value) => {
+    setAirlines(value);
+    setIsAirlinesDropdownOpen(false);
+  };
+
   const [showSteppers, setShowSteppers] = useState(false);
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
@@ -73,15 +120,20 @@ const FlightSearch = () => {
     }
 
     try {
-      const formattedDepartureTime = new Date(departDate).toISOString(); // Преобразование времени в формат ISO
+      const formattedDepartureTime = new Date(departDate).toISOString();
       const response = await axios.get(
         'http://localhost:5001/api/flights/result',
         {
           params: {
             departureAirport,
             arrivalAirport,
-            departureTime: formattedDepartureTime, // Передача времени в формате ISO
+            departureTime: formattedDepartureTime,
             numberOfPassengers: adults + children,
+            sorting,
+            seatClass,
+            stops,
+            price,
+            airlines,
           },
         }
       );
@@ -96,7 +148,6 @@ const FlightSearch = () => {
       searchParams.set('children', children.toString());
       window.history.pushState(null, null, `?${searchParams.toString()}`);
 
-      // Сохраняем результаты поиска в localStorage только если они существуют
       if (response.data) {
         localStorage.setItem('searchResult', JSON.stringify(response.data));
       }
@@ -189,7 +240,153 @@ const FlightSearch = () => {
         </div>
       </form>
       <div className={styles.container}>
-        <div className={styles.searchFilters}>Search filters</div>
+        <div className={styles.searchFilters}>
+          <div className={styles.filterItem}>
+            <div className={styles.dropdown}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button
+                  className={styles.dropdownButton}
+                  onClick={handleSortingClick}
+                >
+                  {sorting || 'Sorting'}
+                </button>
+                <img
+                  style={{ width: 18, height: 18 }}
+                  src={isSortingDropdownOpen ? minus : plus}
+                  alt=""
+                />
+              </div>
+              {isSortingDropdownOpen && (
+                <div className={styles.dropdownContent}>
+                  <div onClick={() => handleSortingChange('Cheap First')}>
+                    Cheap First
+                  </div>
+                  <div onClick={() => handleSortingChange('Recommended')}>
+                    Recommended
+                  </div>
+                  <div onClick={() => handleSortingChange('Best Rated')}>
+                    Best Rated
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className={styles.filterItem}>
+            <div className={styles.dropdown}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button
+                  className={styles.dropdownButton}
+                  onClick={handleSeatClassClick}
+                >
+                  {seatClass || 'Seat Class'}
+                </button>
+                <img
+                  style={{ width: 18, height: 18 }}
+                  src={isSeatClassDropdownOpen ? minus : plus}
+                  alt=""
+                />
+              </div>
+              {isSeatClassDropdownOpen && (
+                <div className={styles.dropdownContent}>
+                  <div onClick={() => handleSeatClassChange('Economy')}>
+                    Economy
+                  </div>
+                  <div onClick={() => handleSeatClassChange('Business')}>
+                    Business
+                  </div>
+                  <div onClick={() => handleSeatClassChange('First Class')}>
+                    First Class
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className={styles.filterItem}>
+            <div className={styles.dropdown}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button
+                  className={styles.dropdownButton}
+                  onClick={handleStopsClick}
+                >
+                  {stops || 'Stops'}
+                </button>
+                <img
+                  style={{ width: 18, height: 18 }}
+                  src={isStopsDropdownOpen ? minus : plus}
+                  alt=""
+                />
+              </div>
+              {isStopsDropdownOpen && (
+                <div className={styles.dropdownContent}>
+                  <div onClick={() => handleStopsChange('Non-stop')}>
+                    Non-stop
+                  </div>
+                  <div onClick={() => handleStopsChange('1 Stop')}>1 Stop</div>
+                  <div onClick={() => handleStopsChange('2+ Stops')}>
+                    2+ Stops
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className={styles.filterItem}>
+            <div className={styles.dropdown}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button
+                  className={styles.dropdownButton}
+                  onClick={handlePriceClick}
+                >
+                  {price || 'Price'}
+                </button>
+                <img
+                  src={isPriceDropdownOpen ? minus : plus}
+                  alt=""
+                  style={{ width: 18, height: 18 }}
+                />
+              </div>
+              {isPriceDropdownOpen && (
+                <div className={styles.dropdownContent}>
+                  <div onClick={() => handlePriceChange('Low to High')}>
+                    Low to High
+                  </div>
+                  <div onClick={() => handlePriceChange('High to Low')}>
+                    High to Low
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className={styles.filterItem}>
+            <div className={styles.dropdown}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button
+                  className={styles.dropdownButton}
+                  onClick={handleAirlinesClick}
+                >
+                  {airlines || 'Airlines'}
+                </button>
+                <img
+                  style={{ width: 18, height: 18 }}
+                  src={isAirlinesDropdownOpen ? minus : plus}
+                  alt=""
+                />
+              </div>
+              {isAirlinesDropdownOpen && (
+                <div className={styles.dropdownContent}>
+                  <div onClick={() => handleAirlinesChange('Delta')}>Delta</div>
+                  <div onClick={() => handleAirlinesChange('United')}>
+                    United
+                  </div>
+                  <div
+                    onClick={() => handleAirlinesChange('American Airlines')}
+                  >
+                    American Airlines
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
         <div>
           {searchResult && <SearchResult searchResult={searchResult} />}
         </div>

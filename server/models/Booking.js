@@ -8,7 +8,7 @@ const bookingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Account',
     required: true,
-  }, // Ссылка на аккаунт
+  }, 
 });
 
 const Booking = mongoose.model('Booking', bookingSchema);

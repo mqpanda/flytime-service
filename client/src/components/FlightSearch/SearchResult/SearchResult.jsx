@@ -5,10 +5,14 @@ import departure from '../../../images/departure.svg';
 import arrow from '../../../images/arrow.svg';
 import alarm from '../../../images/alarm.svg';
 import arrowStop from '../../../images/Component2.svg';
+import flag from '../../../images/Frame1349.png';
+import company from '../../../images/LOT.png';
+import star from '../../../images/star_rate.png';
+import done from '../../../images/done.png';
+
 import axios from 'axios';
 
 const SearchResult = ({ searchResult }) => {
-  const [showModal, setShowModal] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [availableSeats, setAvailableSeats] = useState([]);
   const [occupiedSeats, setOccupiedSeats] = useState([]);
@@ -17,6 +21,12 @@ const SearchResult = ({ searchResult }) => {
   const [passengers, setPassengers] = useState([]); // Состояние для хранения пассажиро
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingError, setBookingError] = useState(null);
+  const [showDirectFlightModal, setShowDirectFlightModal] = useState(false);
+  const [showTransferFlightModal, setShowTransferFlightModal] = useState(false);
+  const [selectedTransferFlight, setSelectedTransferFlight] = useState(null);
+  const [selectedTransferSeat, setSelectedTransferSeat] = useState(null);
+  const [occupiedSeatsInTransferFlight, setOccupiedSeatsInTransferFlight] =
+    useState([]);
 
   useEffect(() => {
     fetchPassengers();
@@ -44,6 +54,15 @@ const SearchResult = ({ searchResult }) => {
     }
   };
 
+  const handleTransferSeatClick = (seatNumber) => {
+    const seatString = String(seatNumber);
+    if (occupiedSeatsInTransferFlight.includes(seatString)) {
+      console.log(`Место ${seatString} уже занято.`);
+    } else {
+      console.log('Место успешно выбрано:', seatString);
+      setSelectedTransferSeat(seatString);
+    }
+  };
   // Получаем accountId из localStorage
   const accountId = localStorage.getItem('accountId');
 
@@ -84,7 +103,7 @@ const SearchResult = ({ searchResult }) => {
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
-    return `${formattedHours}h ${minutes}min ${ampm}`;
+    return `${formattedHours} h ${minutes} min (${ampm})`;
   };
 
   const formatDate = (dateString) => {
@@ -136,12 +155,17 @@ const SearchResult = ({ searchResult }) => {
 
   const openModal = (flight) => {
     setSelectedFlight(flight);
-    setShowModal(true);
+    if (flight.direct !== false) {
+      setShowDirectFlightModal(true);
+    } else {
+      setShowTransferFlightModal(true);
+    }
   };
 
   const closeModal = () => {
     setSelectedFlight(null);
-    setShowModal(false);
+    setShowDirectFlightModal(false);
+    setShowTransferFlightModal(false);
   };
 
   const handleSeatClick = (seatNumber) => {
@@ -152,6 +176,65 @@ const SearchResult = ({ searchResult }) => {
       console.log('Место успешно выбрано:', seatString);
       setSelectedSeat(seatString);
     }
+  };
+
+  // Внутри компонента SearchResult
+
+  const handleConfirmTransferBooking = async () => {
+    if (selectedTransferSeat) {
+      try {
+        const response = await fetch(
+          'http://localhost:5001/api/flight/booking',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              flightId: selectedTransferFlight._id,
+              passengerId: passengerIdInput,
+              accountId: accountId,
+              seatNumber: selectedTransferSeat,
+            }),
+          }
+        );
+        if (response.ok) {
+          console.log('Бронь успешно создана');
+          setBookingSuccess(true);
+        } else {
+          console.error('Ошибка при создании брони:', response.statusText);
+          setBookingError(
+            'Ошибка при создании брони. Пожалуйста, попробуйте еще раз.'
+          );
+        }
+      } catch (error) {
+        console.error('Ошибка при создании брони:', error);
+      }
+    } else {
+      console.log('Выберите место перед бронированием');
+    }
+  };
+
+  const renderSeatsInTransferFlight = () => {
+    const totalSeats = selectedTransferFlight.totalSeats;
+    const seats = [];
+    for (let i = 1; i <= totalSeats; i++) {
+      const isOccupied = occupiedSeatsInTransferFlight.includes(String(i));
+      const isSelected = selectedTransferSeat === String(i);
+      seats.push(
+        <button
+          key={i}
+          className={`${styles.seat} ${isOccupied ? styles.occupiedSeat : ''} ${
+            isSelected ? styles.selectedSeat : ''
+          }`}
+          disabled={isOccupied}
+          onClick={() => handleTransferSeatClick(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+    return seats;
   };
 
   const handleConfirmBooking = async () => {
@@ -189,6 +272,22 @@ const SearchResult = ({ searchResult }) => {
     }
   };
 
+  const handleTransferFlightSelection = async (selectedLeg) => {
+    // Сохраняем выбранный рейс с пересадками
+    setSelectedTransferFlight(selectedLeg.flight);
+
+    try {
+      // Получаем информацию о занятых местах в выбранном рейсе с пересадками
+      const response = await fetch(
+        `http://localhost:5001/api/flights/bookings/occupied-seats/${selectedLeg.flight._id}`
+      );
+      const data = await response.json();
+      setOccupiedSeatsInTransferFlight(data.occupiedSeats);
+    } catch (error) {
+      console.error('Error fetching occupied seats in transfer flight:', error);
+    }
+  };
+
   return (
     <div className={styles.result}>
       {searchResult.flights.map((flight, index) => (
@@ -201,9 +300,15 @@ const SearchResult = ({ searchResult }) => {
             <>
               <div className={styles.resultElementInfo}>
                 <div>
-                  <p>{flight.departureAirport}</p>
-                  <p>{formatTime(flight.departureTime)}</p>
-                  <p>{formatDate(flight.departureTime)}</p>
+                  <p className={styles.departureAirport}>
+                    {flight.departureAirport}
+                  </p>
+                  <p className={styles.departureTime}>
+                    {formatTime(flight.departureTime)}
+                  </p>
+                  <p className={styles.departureDate}>
+                    {formatDate(flight.departureTime)}
+                  </p>
                 </div>
                 <div className={styles.travelInfo}>
                   <div>
@@ -235,59 +340,98 @@ const SearchResult = ({ searchResult }) => {
               <div className={styles.infoElement}>Info airlines</div>
             </>
           ) : (
-            <div className={styles.resultElementInfo}>
-              <div>
-                <p>{flight.legs[0].flight.departureAirport}</p>
-                <p>{formatTime(flight.legs[0].flight.departureTime)}</p>
-                <p>{formatDate(flight.legs[0].flight.departureTime)}</p>
-              </div>
-              <div className={styles.travelInfo}>
-                <div>
-                  <img src={departure} alt="departure" />
-                </div>
-                <div className={styles.flightInfo}>
-                  <div className={styles.flightDuration}>
-                    <img src={alarm} alt="alarm" />
-                    {calculateFlightDuration(
-                      flight.legs[0].flight.departureTime,
-                      flight.legs[flight.legs.length - 1].flight.arrivalTime
-                    )}
+            <div>
+              <div className={styles.resultElementInfo}>
+                <div className={styles.flagBlock}>
+                  <div>
+                    <img src={flag} alt="" />
                   </div>
-                  <img src={arrowStop} alt="" />
-                  <div className={styles.flightDuration}>
-                    {flight.legs[0].flight.arrivalAirport} (
-                    {calculateTransferTime(flight.legs)})
+                  <div className={styles.aLeft}>
+                    <p className={styles.departureAirport}>
+                      {flight.legs[0].flight.departureAirport}
+                    </p>
+                    <p className={styles.departureTime}>
+                      {formatTime(flight.legs[0].flight.departureTime)}
+                    </p>
+                    <p className={styles.departureDate}>
+                      {formatDate(flight.legs[0].flight.departureTime)}
+                    </p>
                   </div>
                 </div>
+                <div className={styles.travelInfo}>
+                  <div>
+                    <img src={departure} alt="departure" />
+                  </div>
+                  <div className={styles.flightInfo}>
+                    <div className={styles.flightDuration}>
+                      <img src={alarm} alt="alarm" />
+                      {calculateFlightDuration(
+                        flight.legs[0].flight.departureTime,
+                        flight.legs[flight.legs.length - 1].flight.arrivalTime
+                      )}
+                    </div>
+                    <img src={arrowStop} alt="" />
+                    <div className={styles.flightDuration}>
+                      {flight.legs[0].flight.arrivalAirport} (
+                      {calculateTransferTime(flight.legs)})
+                    </div>
+                  </div>
+                  <div>
+                    <img src={departure} alt="departure" />
+                  </div>
+                </div>
+                <div className={styles.flagBlock}>
+                  <div>
+                    <img src={flag} alt="" />
+                  </div>
+                  <div className={styles.aLeft}>
+                    <p className={styles.departureAirport}>
+                      {
+                        flight.legs[flight.legs.length - 1].flight
+                          .arrivalAirport
+                      }
+                    </p>
+                    <p className={styles.departureTime}>
+                      {formatTime(
+                        flight.legs[flight.legs.length - 1].flight.arrivalTime
+                      )}
+                    </p>
+                    <p className={styles.departureDate}>
+                      {formatDate(
+                        flight.legs[flight.legs.length - 1].flight.arrivalTime
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.stop}>1 STOP</div>
                 <div>
-                  <img src={departure} alt="departure" />
+                  <div className={styles.price}>
+                    {calculateTotalPrice(flight)}$
+                  </div>
+                  <div className={styles.firstPrice}>720$</div>
                 </div>
               </div>
-              <div>
-                <p>
-                  {flight.legs[flight.legs.length - 1].flight.arrivalAirport}
-                </p>
-                <p>
-                  {formatTime(
-                    flight.legs[flight.legs.length - 1].flight.arrivalTime
-                  )}
-                </p>
-                <p>
-                  {formatDate(
-                    flight.legs[flight.legs.length - 1].flight.arrivalTime
-                  )}
-                </p>
+              <div className={styles.footerResult}>
+                <img src={company} alt="" />
+                <div className={styles.aCenter}>
+                  <img style={{ paddingLeft: 40 }} src={star} alt="" />
+                  <img src={star} alt="" />
+                  <p className={styles.pr40}>business class</p>
+                </div>
+                <div className={styles.aCenter}>
+                  <p style={{ paddingRight: 10 }}>
+                    Free cancellation within 24 h of booking
+                  </p>
+                  <img src={done} alt="" />
+                </div>
               </div>
-              <div>1 STOP</div>
-              <div>{calculateTotalPrice(flight)}$</div>
             </div>
           )}
         </div>
       ))}
-
-      {showModal && (
+      {showDirectFlightModal && (
         <div className={styles.modal}>
-          <div className={styles.modalContent}>
+          <div className={styles.directModalContent}>
             <h2>Available Seats for Flight {selectedFlight.flightNumber}</h2>
 
             <select
@@ -332,7 +476,62 @@ const SearchResult = ({ searchResult }) => {
             {bookingSuccess && <div>Бронь успешно создана!</div>}
             {bookingError && <div className={styles.error}>{bookingError}</div>}
 
-            <button className={styles.close} onClick={handleConfirmBooking}>
+            <div className={styles.btnBlock}>
+              <button className={styles.close} onClick={handleConfirmBooking}>
+                Book
+              </button>
+              <button className={styles.close} onClick={closeModal}>
+                Close Modal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showTransferFlightModal && (
+        <div className={styles.modal}>
+          <div className={styles.transferModalContent}>
+            <h2>Transfer Flights</h2>
+            <select
+              value={passengerIdInput}
+              onChange={(e) => setPassengerIdInput(e.target.value)}
+            >
+              <option value="">Выберите пассажира</option>
+              {passengers.map((passenger) => (
+                <option key={passenger._id} value={passenger._id}>
+                  {passenger.last_name} {passenger.first_name}
+                </option>
+              ))}
+            </select>
+            {/* Создаем кнопки для каждого рейса с пересадками */}
+            {selectedFlight.legs.map((leg, index) => (
+              <button
+                key={index}
+                onClick={() => handleTransferFlightSelection(leg)}
+                className={styles.transferFlightButton}
+              >
+                {leg.flight.departureAirport} - {leg.flight.arrivalAirport}
+              </button>
+            ))}
+            {/* Выводим места в рейсе с пересадками */}
+            {selectedTransferFlight && (
+              <div>
+                <h3>
+                  Available Seats for Flight{' '}
+                  {selectedTransferFlight.flightNumber}
+                </h3>
+                <div className={styles.seatsContainer}>
+                  {renderSeatsInTransferFlight()}
+                </div>
+              </div>
+            )}
+            {bookingSuccess && <div>Бронь успешно создана!</div>}
+            {bookingError && <div className={styles.error}>{bookingError}</div>}
+
+            <button
+              className={styles.close}
+              onClick={handleConfirmTransferBooking}
+            >
               Book
             </button>
             <button className={styles.close} onClick={closeModal}>

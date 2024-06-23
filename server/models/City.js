@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const airlineSchema = new mongoose.Schema(
+const citySchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -17,6 +17,6 @@ const airlineSchema = new mongoose.Schema(
   }
 );
 
-const Airline = mongoose.model('Airline', airlineSchema);
+const City = mongoose.model('City', citySchema);
 
-export default Airline;
+export default City;
